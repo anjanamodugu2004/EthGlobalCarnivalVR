@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4368820303972012231
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4029308003704654461}
+  m_Layer: 0
+  m_Name: 11750_throwing_dart_v1_L3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4029308003704654461
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4368820303972012231}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -12.271, y: 1.73, z: 12.15}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 7194486325940761408}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &7218745093765668754
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4029308003704654461}
+    m_Modifications:
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -12.271
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.73
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 12.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6201481
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.018679678
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7839068
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.023612307
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0.794
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 103.282
+      objectReference: {fileID: 0}
+    - target: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -3.358
+      objectReference: {fileID: 0}
+    - target: {fileID: 2033748665361638999, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+      propertyPath: m_Name
+      value: throwing_dart
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+--- !u!4 &7194486325940761408 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 574720605684083922, guid: cdda155dc24d26d4992fc281adfe1f65, type: 3}
+  m_PrefabInstance: {fileID: 7218745093765668754}
+  m_PrefabAsset: {fileID: 0}
