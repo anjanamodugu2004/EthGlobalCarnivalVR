@@ -15,7 +15,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import javax.inject.Inject
-import java.math.BigInteger
+import com.eth.vrcarnival.data.models.GameNFT
+import com.eth.vrcarnival.data.models.GameNFTData
 
 @HiltViewModel
 class WalletViewModel @Inject constructor(
@@ -42,6 +43,9 @@ class WalletViewModel @Inject constructor(
         private set
 
     var nfts by mutableStateOf<List<NFT>>(emptyList())
+        private set
+
+    var gameNFTs by mutableStateOf<List<GameNFT>>(emptyList())
         private set
 
     var balance by mutableStateOf<WalletBalance?>(null)
@@ -113,6 +117,15 @@ class WalletViewModel @Inject constructor(
         }
     }
 
+    fun loadGameNFTs() {
+        // Only load NFTs on Sepolia testnet
+        if (selectedChain.chainId == 11155111) {
+            gameNFTs = GameNFTData.getGameNFTs()
+        } else {
+            gameNFTs = emptyList()
+        }
+    }
+
     fun getChains(): List<Chain> = listOf(
         Chain(1, "Ethereum Mainnet", "ETH"),
         Chain(11155111, "Sepolia Testnet", "ETH", true),
@@ -132,10 +145,11 @@ class WalletViewModel @Inject constructor(
         balance = null
         availableTokens = emptyList()
         carTokenBalance = null
+        gameNFTs = emptyList()
 
-        // Load new data for selected chain
         loadWalletData()
         loadAvailableTokens()
+        loadGameNFTs()
     }
 
     fun sendOtp(email: String) {
@@ -199,6 +213,7 @@ class WalletViewModel @Inject constructor(
             loadNFTs(auth.walletAddress)
             loadBalance(auth.walletAddress)
             loadCarToken(auth.walletAddress)
+            loadGameNFTs()
         }
     }
 
