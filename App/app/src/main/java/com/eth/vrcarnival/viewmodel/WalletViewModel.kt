@@ -13,7 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 import javax.inject.Inject
+import java.math.BigInteger
 
 @HiltViewModel
 class WalletViewModel @Inject constructor(
@@ -49,6 +51,9 @@ class WalletViewModel @Inject constructor(
         private set
 
     var isSendingToken by mutableStateOf(false)
+        private set
+
+    var showSendDialog by mutableStateOf(false)
         private set
 
     var sendTokenSuccess by mutableStateOf<String?>(null)
@@ -225,6 +230,19 @@ class WalletViewModel @Inject constructor(
         }
     }
 
+    fun openSendDialog() {
+        showSendDialog = true
+    }
+
+    fun closeSendDialog() {
+        showSendDialog = false
+        // Reset states when closing
+        sendTokenSuccess = null
+        error = null
+        isSendingToken = false
+        isVerifyingTransaction = false
+    }
+
     private fun loadNFTs(address: String) {
         viewModelScope.launch {
             try {
@@ -271,13 +289,15 @@ class WalletViewModel @Inject constructor(
                 sendTokenSuccess = null
 
                 try {
-                    // Convert quantity to wei (multiply by 10^18 for ETH)
+                    // Better wei conversion using BigDecimal to avoid overflow
                     val quantityInWei = try {
-                        val quantityDouble = quantity.toDouble()
-                        val wei = (quantityDouble * Math.pow(10.0, 18.0)).toLong()
-                        wei.toString()
+                        val quantityBigDecimal = quantity.toBigDecimal()
+                        val weiMultiplier = BigDecimal.TEN.pow(18)
+                        val weiAmount = quantityBigDecimal * weiMultiplier
+                        weiAmount.toBigInteger().toString()
                     } catch (e: Exception) {
-                        quantity // Use original if conversion fails
+                        error = "Invalid amount format"
+                        return@launch
                     }
 
                     val request = SendTokenRequest(
@@ -297,7 +317,7 @@ class WalletViewModel @Inject constructor(
                         val transactionId = result?.transactionIds?.firstOrNull()
                         if (transactionId != null) {
                             sendTokenSuccess = transactionId
-                            // Start balance verification
+                            // Start verification and auto-close dialog when done
                             verifyTransactionSuccess(auth.walletAddress, quantity)
                         } else {
                             error = "Transaction failed - no transaction ID returned"
@@ -314,55 +334,55 @@ class WalletViewModel @Inject constructor(
         }
     }
 
+    // Replace the existing verifyTransactionSuccess function:
     private fun verifyTransactionSuccess(walletAddress: String, expectedChange: String) {
         viewModelScope.launch {
             isVerifyingTransaction = true
-
-            // Store initial balance for comparison
             val initialBalance = balance?.value
 
-            // Poll for 30 seconds to verify balance change
-            repeat(30) { attempt ->
-                delay(1000) // Wait 1 second between checks
+            repeat(60) { attempt ->
+                delay(1000)
 
                 try {
-                    // Reload balance
+                    // Check balance change
                     val response = repository.getBalance(walletAddress, selectedChain.chainId)
                     if (response.isSuccessful) {
                         val newBalances = response.body()?.result
                         val newBalance = newBalances?.firstOrNull()
 
-                        // Compare with initial balance
                         if (newBalance?.value != initialBalance) {
-                            // Balance changed, transaction likely successful
                             balance = newBalance
-                            loadWalletData() // Refresh all wallet data
+                            loadWalletData()
                             isVerifyingTransaction = false
+                            // Auto-close dialog on success
+                            delay(1500) // Show success message briefly
+                            closeSendDialog()
                             return@launch
                         }
                     }
 
-                    // Also try the verify balance change endpoint
+                    // Also try verify endpoint
                     val verifyRequest = VerifyBalanceChangeRequest(
                         walletAddress = walletAddress,
                         chainId = selectedChain.chainId,
                         expectedChange = "-$expectedChange",
-                        tokenAddress = null // For native token
+                        tokenAddress = null
                     )
 
                     val verifyResponse = repository.verifyBalanceChange(verifyRequest)
                     if (verifyResponse.isSuccessful && verifyResponse.body()?.result == true) {
-                        // Transaction verified successfully
-                        loadWalletData() // Refresh wallet data
+                        loadWalletData()
                         isVerifyingTransaction = false
+                        delay(1500)
+                        closeSendDialog()
                         return@launch
                     }
                 } catch (e: Exception) {
-                    // Continue polling on error
+                    // Continue polling
                 }
             }
 
-            // If we reach here, verification failed/timed out
+            // Verification timed out but don't auto-close - let user decide
             isVerifyingTransaction = false
             error = "Transaction verification timed out - check transaction status manually"
         }

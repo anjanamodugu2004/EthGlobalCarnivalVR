@@ -305,4 +305,119 @@ router.post("/verify-balance-change", async (req, res) => {
   }
 });
 
+
+/**
+ * 9️⃣ Get specific ERC20 token balance (0x72f5dE906CccE499278525C6D4222378a6AEe368)
+ * GET /v1/wallets/{address}/token-balance
+ */
+router.get("/wallets/:address/token-balance", async (req, res) => {
+  const { address } = req.params;
+  const { chainId } = req.query;
+
+  try {
+    if (!chainId) {
+      return res.status(400).json({ error: "chainId is required" });
+    }
+
+    // Hardcoded token address as per your requirement
+    const tokenAddress = "0x72f5dE906CccE499278525C6D4222378a6AEe368";
+
+    // Build query string
+    const params = new URLSearchParams();
+    params.append('chainId', chainId);
+    params.append('tokenAddress', tokenAddress);
+
+    const data = await callThirdwebAPI(`/v1/wallets/${address}/balance?${params.toString()}`);
+
+    // Format response to match your SDK example output
+    const balance = data.result?.[0];
+    if (balance) {
+      res.json({
+        displayValue: balance.displayValue,
+        symbol: balance.symbol,
+        name: balance.name,
+        address: balance.tokenAddress,
+        decimals: balance.decimals,
+        rawBalance: balance.balance
+      });
+    } else {
+      res.json({
+        displayValue: "0",
+        symbol: "Unknown",
+        address: tokenAddress,
+        message: "No balance found for this token"
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch token balance" });
+  }
+});
+
+/**
+ * 🔟 Transfer CAR tokens
+ * POST /v1/contracts/car-token/transfer
+ */
+router.post("/contracts/car-token/transfer", async (req, res) => {
+  try {
+    const { toAddress, amount, fromAddress } = req.body;
+
+    if (!toAddress || !amount || !fromAddress) {
+      return res.status(400).json({
+        error: "Missing required fields: toAddress, amount, fromAddress"
+      });
+    }
+
+    // Check if Authorization header is provided
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: "Authorization token required" });
+    }
+
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": authHeader
+    };
+
+    // Construct the contract write request using the proper format
+    const contractWriteData = {
+      calls: [
+        {
+          contractAddress: "0x72f5dE906CccE499278525C6D4222378a6AEe368",
+          method: "function transfer(address to, uint256 amount)",
+          params: [toAddress, amount]
+        }
+      ],
+      chainId: 11155111, // Sepolia
+      from: fromAddress
+    };
+
+    const data = await callThirdwebAPI(
+      `/v1/contracts/write`,
+      "POST",
+      contractWriteData,
+      headers
+    );
+
+    // Log the full response to understand the structure
+    console.log("Thirdweb API Response:", JSON.stringify(data, null, 2));
+
+    res.json({
+      success: true,
+      result: {
+        transactionHash: data.result?.transactionHash || data.result?.hash || "pending",
+        transactionId: data.result?.queueId || data.result?.transactionId || data.result?.id || "success",
+        message: "CAR token transfer initiated successfully",
+        fullResponse: data // Include full response for debugging
+      }
+    });
+  } catch (err) {
+    console.error("CAR token transfer error:", err);
+    res.status(500).json({
+      error: "Failed to transfer CAR tokens",
+      details: err.message
+    });
+  }
+});
+
 module.exports = router;

@@ -198,16 +198,16 @@ val MaterialTheme.gamingGradients: GameGradientColors
     get() = GameGradientColors
 
 object GameGradientColors {
-    val powerMeter @Composable get() = GameGradients.powerMeterGradient
-    val holographicCard @Composable get() = GameGradients.holographicCard
-    val legendary @Composable get() = GameGradients.legendaryGradient
-    val epic @Composable get() = GameGradients.epicGradient
-    val rare @Composable get() = GameGradients.rareGradient
-    val gameBackground @Composable get() = GameGradients.gameBackground
-    val celebration @Composable get() = GameGradients.celebrationGradient
-    val ethereumWorld @Composable get() = GameGradients.ethereumWorld
-    val polygonWorld @Composable get() = GameGradients.polygonWorld
-    val bscWorld @Composable get() = GameGradients.bscWorld
+    val powerMeter @Composable get() = RefinedGradients.powerMeterGradient
+    val holographicCard @Composable get() = RefinedGradients.holographicCard
+    val legendary @Composable get() = RefinedGradients.legendaryGradient
+    val epic @Composable get() = RefinedGradients.epicGradient
+    val rare @Composable get() = RefinedGradients.rareGradient
+//    val gameBackground @Composable get() = RefinedGradients.gameBackground
+    val celebration @Composable get() = RefinedGradients.celebrationGradient
+//    val ethereumWorld @Composable get() = RefinedGradients.ethereumWorld
+//    val polygonWorld @Composable get() = RefinedGradients.polygonWorld
+//    val bscWorld @Composable get() = RefinedGradients.bscWorld
 }
 
 // Gaming theme configuration object

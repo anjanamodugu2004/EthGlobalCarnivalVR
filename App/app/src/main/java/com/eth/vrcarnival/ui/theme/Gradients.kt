@@ -4,24 +4,26 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-object GameGradients {
-    // Power meter gradients
-    val powerMeterGradient = Brush.linearGradient(
-        colors = listOf(PowerMeterStart, PowerMeterEnd),
-        start = Offset.Zero,
-        end = Offset.Infinite
+object RefinedGradients {
+    val elegantCard = Brush.linearGradient(
+        colors = listOf(
+            GameSurface.copy(alpha = 0.9f),
+            GameSurfaceVariant.copy(alpha = 0.6f),
+            GameSurface.copy(alpha = 0.9f)
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(300f, 300f)
     )
 
-    // Holographic card effects
-    val holographicCard = Brush.linearGradient(
+    val subtleBorder = Brush.linearGradient(
         colors = listOf(
-            HolographicBlue.copy(alpha = 0.3f),
-            NeonPurple.copy(alpha = 0.2f),
-            ElectricBlue.copy(alpha = 0.3f)
+            ElectricBlue.copy(alpha = 0.6f),
+            NeonPurple.copy(alpha = 0.4f),
+            CyberGreen.copy(alpha = 0.3f)
         )
     )
 
-    // Achievement gradients
+    // Achievement gradients using your rarity colors
     val legendaryGradient = Brush.linearGradient(
         colors = listOf(GoldTrophy, RarityLegendary)
     )
@@ -34,13 +36,51 @@ object GameGradients {
         colors = listOf(RarityRare, ElectricBlue)
     )
 
-    // Background gradients
-    val gameBackground = Brush.verticalGradient(
+    val commonGradient = Brush.linearGradient(
+        colors = listOf(RarityCommon, GameSurfaceVariant)
+    )
+
+    // Background gradient using your gaming colors
+    val backgroundGradient = Brush.verticalGradient(
         colors = listOf(
             GameBackground,
             GameSurface.copy(alpha = 0.8f),
             GameBackground
         )
+    )
+
+    // Power meter gradient using your original colors
+    val powerMeterGradient = Brush.linearGradient(
+        colors = listOf(PowerMeterStart, PowerMeterEnd),
+        start = Offset.Zero,
+        end = Offset.Infinite
+    )
+
+    // Holographic card using your colors
+    val holographicCard = Brush.linearGradient(
+        colors = listOf(
+            HolographicBlue.copy(alpha = 0.3f),
+            NeonPurple.copy(alpha = 0.2f),
+            ElectricBlue.copy(alpha = 0.3f)
+        )
+    )
+
+    // Subtle glow effect with your electric blue
+    val glowEffect = Brush.radialGradient(
+        colors = listOf(
+            ElectricBlue.copy(alpha = 0.15f),
+            Color.Transparent
+        ),
+        radius = 200f
+    )
+
+    // Success/Error gradients using your status colors
+    val successGradient = Brush.linearGradient(
+        colors = listOf(CyberGreen, SuccessGreen)
+    )
+
+    val errorGradient = Brush.linearGradient(
+        colors = listOf(DangerRed, ElectricRed)
     )
 
     // Celebration effects
@@ -50,18 +90,5 @@ object GameGradients {
             GoldTrophy.copy(alpha = 0.6f),
             Color.Transparent
         )
-    )
-
-    // Network world gradients
-    val ethereumWorld = Brush.linearGradient(
-        colors = listOf(Color(0xFF627EEA), Color(0xFF8B5CF6))
-    )
-
-    val polygonWorld = Brush.linearGradient(
-        colors = listOf(Color(0xFF8247E5), Color(0xFFBB44E6))
-    )
-
-    val bscWorld = Brush.linearGradient(
-        colors = listOf(Color(0xFFF3BA2F), Color(0xFFE0A82E))
     )
 }
