@@ -47,6 +47,6 @@ public class JokerGameManager : MonoBehaviour
     {
         isGameActive = false;
         timerText.gameObject.SetActive(false);
-        dartSpawner.StopSpawning();
+        //dartSpawner.StopSpawning();
     }
 }
