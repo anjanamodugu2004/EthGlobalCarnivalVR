@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,6 +18,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,6 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.eth.vrcarnival.data.models.TokenInfo
 import com.eth.vrcarnival.ui.components.*
+import com.eth.vrcarnival.ui.theme.GameSurface
+import com.eth.vrcarnival.ui.theme.GameSurfaceVariant
+import com.eth.vrcarnival.ui.theme.GoldTrophy
+import com.eth.vrcarnival.ui.theme.RarityEpic
+import com.eth.vrcarnival.ui.theme.RarityRare
+import com.eth.vrcarnival.ui.theme.RefinedGradients
+import com.eth.vrcarnival.ui.theme.TextAccent
+import com.eth.vrcarnival.ui.theme.TextPrimary
+import com.eth.vrcarnival.ui.theme.TextSecondary
 import com.eth.vrcarnival.viewmodel.WalletViewModel
 import kotlinx.coroutines.delay
 
@@ -64,7 +76,7 @@ fun WalletScreen(
             // Header
             item {
                 WalletHeader(
-                    onSendClick = { showSendDialog = true },
+                    onSendClick = { viewModel.openSendDialog() },
                     onLogoutClick = {
                         viewModel.logout()
                         onLogout()
@@ -104,7 +116,6 @@ fun WalletScreen(
                 }
             }
 
-            // Balance
             item {
                 PowerMeterBalance(
                     balance = viewModel.balance?.displayValue ?: "0",
@@ -203,10 +214,10 @@ fun WalletScreen(
     }
 
     // Dialogs
-    if (showSendDialog) {
+    if (viewModel.showSendDialog) {
         SendTokenDialog(
             viewModel = viewModel,
-            onDismiss = { showSendDialog = false }
+            onDismiss = { viewModel.closeSendDialog() }
         )
     }
 
@@ -218,9 +229,8 @@ fun WalletScreen(
         )
     }
 
-    // Messages
-    viewModel.sendTokenSuccess?.let { txId ->
-        LaunchedEffect(txId) {
+    LaunchedEffect(viewModel.sendTokenSuccess) {
+        viewModel.sendTokenSuccess?.let { txId ->
             Toast.makeText(context, "Transaction sent: ${txId.take(8)}...", Toast.LENGTH_LONG).show()
             viewModel.clearSendTokenSuccess()
         }
@@ -230,6 +240,148 @@ fun WalletScreen(
         LaunchedEffect(error) {
             Toast.makeText(context, error, Toast.LENGTH_LONG).show()
             viewModel.clearError()
+        }
+    }
+}
+
+@Composable
+fun InventoryTokenItem(
+    tokenName: String,
+    tokenSymbol: String,
+    balance: String,
+    rarity: String = "common",
+    modifier: Modifier = Modifier
+) {
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        isVisible = true
+    }
+
+    val rarityGradient = when (rarity.lowercase()) {
+        "legendary" -> RefinedGradients.legendaryGradient
+        "epic" -> RefinedGradients.epicGradient
+        "rare" -> RefinedGradients.rareGradient
+        else -> Brush.linearGradient(colors = listOf(GameSurface, GameSurfaceVariant))
+    }
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(tween(400)) + slideInHorizontally(
+            tween(400),
+            initialOffsetX = { it / 3 }
+        )
+    ) {
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Transparent
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(rarityGradient)
+                    .border(
+                        2.dp,
+                        when (rarity.lowercase()) {
+                            "legendary" -> GoldTrophy
+                            "epic" -> RarityEpic
+                            "rare" -> RarityRare
+                            else -> GameSurfaceVariant
+                        },
+                        RoundedCornerShape(16.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        // Token icon with rarity effect
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    when (rarity.lowercase()) {
+                                        "legendary" -> RefinedGradients.legendaryGradient
+                                        "epic" -> RefinedGradients.epicGradient
+                                        "rare" -> RefinedGradients.rareGradient
+                                        else -> RefinedGradients.powerMeterGradient
+                                    }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = (tokenSymbol.firstOrNull() ?: "?").toString(),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column {
+                            Text(
+                                text = tokenName,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = tokenSymbol,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = TextSecondary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                // Rarity indicator
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            when (rarity.lowercase()) {
+                                                "legendary" -> GoldTrophy
+                                                "epic" -> RarityEpic
+                                                "rare" -> RarityRare
+                                                else -> TextSecondary
+                                            }
+                                        )
+                                )
+                            }
+                        }
+                    }
+
+                    // Balance with stack count style
+                    Column(
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(
+                            text = balance,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                        Text(
+                            text = "x${balance.split(".")[0]}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextAccent
+                        )
+                    }
+                }
+            }
         }
     }
 }

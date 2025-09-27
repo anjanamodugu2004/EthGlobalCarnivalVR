@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,49 +17,67 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.eth.vrcarnival.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
 fun AnimatedGradientCard(
     modifier: Modifier = Modifier,
+    borderGlow: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        delay(100)
+        delay(150)
         visible = true
     }
 
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(tween(GameThemeConfig.SLOW_ANIMATION)) + slideInVertically(
-            tween(GameThemeConfig.SLOW_ANIMATION),
-            initialOffsetY = { it / 4 }
-        ),
+        enter = fadeIn(tween(500, easing = FastOutSlowInEasing)) +
+                slideInVertically(tween(500, easing = FastOutSlowInEasing), initialOffsetY = { it / 6 }),
         modifier = modifier
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(GameThemeConfig.largeCornerRadius),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.Transparent
-            ),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(GameGradients.holographicCard)
-                    .border(
-                        1.dp,
-                        GameGradients.powerMeterGradient,
-                        RoundedCornerShape(GameThemeConfig.largeCornerRadius)
+                    .background(RefinedGradients.elegantCard)
+                    .then(
+                        if (borderGlow) {
+                            Modifier.border(
+                                1.dp,
+                                RefinedGradients.subtleBorder,
+                                RoundedCornerShape(16.dp)
+                            )
+                        } else {
+                            Modifier.border(
+                                0.5.dp,
+                                TextSecondary.copy(alpha = 0.2f),
+                                RoundedCornerShape(16.dp)
+                            )
+                        }
                     )
-                    .padding(GameThemeConfig.xlSpace),
+                    .padding(24.dp)
             ) {
+                // Subtle background glow with your colors
+                if (borderGlow) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(RefinedGradients.glowEffect)
+                    )
+                }
+
                 Column(content = content)
             }
         }
@@ -67,28 +85,27 @@ fun AnimatedGradientCard(
 }
 
 @Composable
-fun GamePulsingDot(
+fun ElegantPulse(
     color: Color = ElectricBlue,
-    size: Float = 8f,
-    pulseIntensity: Float = 1.4f,
-    duration: Int = 1000
+    size: Float = 6f,
+    intensity: Float = 1.3f
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "game_pulse")
+    val infiniteTransition = rememberInfiniteTransition(label = "elegant_pulse")
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = pulseIntensity,
+        targetValue = intensity,
         animationSpec = infiniteRepeatable(
-            animation = tween(duration, easing = FastOutSlowInEasing),
+            animation = tween(2000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "pulse"
+        label = "pulse_scale"
     )
 
     val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
-        targetValue = 1f,
+        initialValue = 0.4f,
+        targetValue = 0.8f,
         animationSpec = infiniteRepeatable(
-            animation = tween(duration),
+            animation = tween(2000),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulse_alpha"
@@ -103,52 +120,34 @@ fun GamePulsingDot(
 }
 
 @Composable
-fun PulsingDot(
-    color: Color = MaterialTheme.gamingColors.electricBlue,
-    size: Float = 8f
-) {
-    GamePulsingDot(color = color, size = size)
-}
-
-@Composable
-fun GameShimmerBox(
+fun SmoothShimmer(
     modifier: Modifier = Modifier,
     baseColor: Color = GameSurfaceVariant,
     highlightColor: Color = ElectricBlue
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "game_shimmer")
+    val infiniteTransition = rememberInfiniteTransition(label = "smooth_shimmer")
 
     val shimmerProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
+            animation = tween(1800, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "shimmer_progress"
     )
 
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "shimmer_alpha"
-    )
-
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(GameThemeConfig.smallCornerRadius))
+            .clip(RoundedCornerShape(8.dp))
             .background(
                 Brush.horizontalGradient(
                     colors = listOf(
-                        baseColor,
-                        highlightColor.copy(alpha = alpha),
-                        baseColor
+                        baseColor.copy(alpha = 0.3f),
+                        highlightColor.copy(alpha = 0.5f),
+                        baseColor.copy(alpha = 0.3f)
                     ),
-                    startX = shimmerProgress * 300f,
+                    startX = shimmerProgress * 300f - 100f,
                     endX = shimmerProgress * 300f + 100f
                 )
             )
@@ -156,99 +155,279 @@ fun GameShimmerBox(
 }
 
 @Composable
-fun ShimmerBox(
-    modifier: Modifier = Modifier
-) {
-    GameShimmerBox(modifier = modifier)
-}
-
-@Composable
-fun HolographicCard(
-    modifier: Modifier = Modifier,
-    borderWidth: Float = 2f,
-    content: @Composable BoxScope.() -> Unit
-) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        delay(200)
-        isVisible = true
-    }
-
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = fadeIn(tween(GameThemeConfig.POWER_UP_ANIMATION)) +
-                scaleIn(tween(GameThemeConfig.POWER_UP_ANIMATION, easing = FastOutSlowInEasing))
-    ) {
-        Card(
-            modifier = modifier,
-            shape = RoundedCornerShape(GameThemeConfig.largeCornerRadius),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            elevation = CardDefaults.cardElevation(defaultElevation = GameThemeConfig.elevatedCardElevation)
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(GameGradients.holographicCard)
-                    .border(
-                        borderWidth.dp,
-                        GameGradients.powerMeterGradient,
-                        RoundedCornerShape(GameThemeConfig.largeCornerRadius)
-                    ),
-                content = content
-            )
-        }
-    }
-}
-
-@Composable
-fun PowerUpEffect(
+fun GentleGlow(
     isActive: Boolean,
     modifier: Modifier = Modifier,
+    glowColor: Color = ElectricBlue,
     content: @Composable () -> Unit
 ) {
-    val scale by animateFloatAsState(
-        targetValue = if (isActive) 1.1f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "power_up_scale"
+    val glowAlpha by animateFloatAsState(
+        targetValue = if (isActive) 0.4f else 0f,
+        animationSpec = tween(400, easing = FastOutSlowInEasing),
+        label = "glow_alpha"
     )
 
-    val glow by animateFloatAsState(
-        targetValue = if (isActive) 1f else 0f,
-        animationSpec = tween(GameThemeConfig.NORMAL_ANIMATION),
-        label = "power_up_glow"
+    val scale by animateFloatAsState(
+        targetValue = if (isActive) 1.02f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
+        label = "glow_scale"
     )
 
     Box(
         modifier = modifier
             .scale(scale)
-            .then(
-                if (isActive) {
-                    Modifier.border(
-                        (2 * glow).dp,
-                        GameGradients.celebrationGradient,
-                        RoundedCornerShape(GameThemeConfig.mediumCornerRadius)
-                    )
-                } else Modifier
+            .background(
+                glowColor.copy(alpha = glowAlpha),
+                RoundedCornerShape(12.dp)
             )
     ) {
         content()
+    }
+}
 
-        if (isActive) {
-            // Sparkle effects around the content
-            repeat(4) { index ->
-                SparkleParticle(
-                    delay = index * 100L,
-                    modifier = Modifier.align(
-                        when (index) {
-                            0 -> Alignment.TopStart
-                            1 -> Alignment.TopEnd
-                            2 -> Alignment.BottomStart
-                            else -> Alignment.BottomEnd
-                        }
+@Composable
+fun PremiumCard(
+    rarity: String = "common",
+    onClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
+    val cardGradient = when (rarity.lowercase()) {
+        "legendary" -> RefinedGradients.legendaryGradient
+        "epic" -> RefinedGradients.epicGradient
+        "rare" -> RefinedGradients.rareGradient
+        else -> RefinedGradients.elegantCard
+    }
+
+    val borderColor = when (rarity.lowercase()) {
+        "legendary" -> GoldTrophy
+        "epic" -> RarityEpic
+        "rare" -> RarityRare
+        else -> TextSecondary.copy(alpha = 0.2f)
+    }
+
+    val isInteractive = onClick != null
+    var isPressed by remember { mutableStateOf(false) }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.98f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "card_scale"
+    )
+
+    Card(
+        onClick = onClick ?: {},
+        modifier = modifier.scale(scale),
+        enabled = isInteractive,
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (rarity != "common") 4.dp else 2.dp
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(cardGradient)
+                .border(
+                    if (rarity != "common") 1.dp else 0.5.dp,
+                    borderColor,
+                    RoundedCornerShape(12.dp)
+                ),
+            content = content
+        )
+    }
+}
+
+@Composable
+fun PowerMeterBalance(
+    balance: String,
+    symbol: String,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier
+) {
+    var isVisible by remember { mutableStateOf(false) }
+    var powerLevel by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(balance) {
+        isVisible = true
+        // Animate power level based on balance
+        powerLevel = (balance.toFloatOrNull() ?: 0f) / 100f // Normalize to 0-1
+        powerLevel = powerLevel.coerceIn(0f, 1f)
+    }
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(tween(800)) + scaleIn(tween(800))
+    ) {
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Transparent
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(RefinedGradients.holographicCard)
+                    .border(
+                        2.dp,
+                        RefinedGradients.powerMeterGradient,
+                        RoundedCornerShape(20.dp)
                     )
+                    .padding(24.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "POWER LEVEL",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = TextAccent,
+                                letterSpacing = 2.sp
+                            )
+
+                            if (isLoading) {
+                                SmoothShimmer(
+                                    modifier = Modifier
+                                        .width(140.dp)
+                                        .height(32.dp)
+                                        .padding(top = 8.dp)
+                                )
+                            } else {
+                                Text(
+                                    text = balance,
+                                    style = MaterialTheme.typography.displayLarge,
+                                    color = TextPrimary,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                                Text(
+                                    text = symbol,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = TextAccent
+                                )
+                            }
+                        }
+
+                        // Power level indicator
+                        PowerLevelMeter(
+                            level = powerLevel,
+                            modifier = Modifier.size(80.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Animated power bar
+                    PowerBar(
+                        progress = powerLevel,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PowerLevelMeter(
+    level: Float,
+    modifier: Modifier = Modifier
+) {
+    val animatedLevel by animateFloatAsState(
+        targetValue = level,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "power_level"
+    )
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        // Outer ring
+        CircularProgressIndicator(
+            progress = { 1f },
+            modifier = Modifier.fillMaxSize(),
+            color = GameSurfaceVariant,
+            strokeWidth = 8.dp,
+        )
+
+        // Power level ring
+        CircularProgressIndicator(
+            progress = { animatedLevel },
+            modifier = Modifier.fillMaxSize(),
+            color = when {
+                animatedLevel > 0.8f -> CyberGreen
+                animatedLevel > 0.5f -> ShandyYellow
+                animatedLevel > 0.2f -> WarningOrange
+                else -> DangerRed
+            },
+            strokeWidth = 8.dp,
+        )
+
+        // Center power indicator
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(
+                    when {
+                        animatedLevel > 0.8f -> RefinedGradients.celebrationGradient
+                        else -> RefinedGradients.powerMeterGradient
+                    }
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Default.Bolt,
+                contentDescription = null,
+                tint = TextPrimary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun PowerBar(
+    progress: Float,
+    modifier: Modifier = Modifier
+) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(1200, easing = FastOutSlowInEasing),
+        label = "power_bar"
+    )
+
+    Box(
+        modifier = modifier
+            .height(12.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(GameSurfaceVariant)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(animatedProgress)
+                .clip(RoundedCornerShape(6.dp))
+                .background(RefinedGradients.powerMeterGradient)
+        )
+
+        // Animated sparkles along the bar
+        if (animatedProgress > 0.1f) {
+            repeat(3) { index ->
+                SparkleEffect(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .offset(x = (animatedProgress * 200 * (index + 1) / 3).dp)
                 )
             }
         }
@@ -256,145 +435,25 @@ fun PowerUpEffect(
 }
 
 @Composable
-fun SparkleParticle(
-    delay: Long = 0L,
+fun SparkleEffect(
     modifier: Modifier = Modifier
 ) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        delay(delay)
-        isVisible = true
-    }
-
     val infiniteTransition = rememberInfiniteTransition(label = "sparkle")
-
     val scale by infiniteTransition.animateFloat(
         initialValue = 0.5f,
-        targetValue = 1.2f,
+        targetValue = 1.5f,
         animationSpec = infiniteRepeatable(
-            animation = tween(800),
+            animation = tween(1000),
             repeatMode = RepeatMode.Reverse
         ),
         label = "sparkle_scale"
     )
 
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "sparkle_rotation"
+    Box(
+        modifier = modifier
+            .size(4.dp)
+            .scale(scale)
+            .clip(CircleShape)
+            .background(ShandyYellow)
     )
-
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = fadeIn(tween(300)) + scaleIn(tween(300))
-    ) {
-        Icon(
-            Icons.Default.Star,
-            contentDescription = null,
-            tint = ShandyYellow,
-            modifier = modifier
-                .size((8 * scale).dp)
-                .graphicsLayer {
-                    rotationZ = rotation
-                }
-        )
-    }
-}
-
-@Composable
-fun LoadingOrb(
-    isLoading: Boolean,
-    modifier: Modifier = Modifier
-) {
-    AnimatedVisibility(
-        visible = isLoading,
-        enter = fadeIn(tween(GameThemeConfig.NORMAL_ANIMATION)) + scaleIn(tween(GameThemeConfig.NORMAL_ANIMATION)),
-        exit = fadeOut(tween(GameThemeConfig.FAST_ANIMATION)) + scaleOut(tween(GameThemeConfig.FAST_ANIMATION))
-    ) {
-        val infiniteTransition = rememberInfiniteTransition(label = "loading_orb")
-
-        val rotation by infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 360f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1500, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "orb_rotation"
-        )
-
-        val scale by infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 1.2f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "orb_scale"
-        )
-
-        Box(
-            modifier = modifier
-                .size((48 * scale).dp)
-                .graphicsLayer { rotationZ = rotation }
-                .clip(CircleShape)
-                .background(GameGradients.powerMeterGradient)
-                .border(2.dp, ElectricBlue, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .background(CyberGreen)
-            )
-        }
-    }
-}
-
-@Composable
-fun CelebrationBurst(
-    isTriggered: Boolean,
-    onComplete: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    var showBurst by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isTriggered) {
-        if (isTriggered) {
-            showBurst = true
-            delay(GameThemeConfig.CELEBRATION_ANIMATION.toLong())
-            showBurst = false
-            onComplete()
-        }
-    }
-
-    AnimatedVisibility(
-        visible = showBurst,
-        enter = fadeIn(tween(200)) + scaleIn(tween(200)),
-        exit = fadeOut(tween(300)) + scaleOut(tween(300))
-    ) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            // Multiple sparkle bursts
-            repeat(12) { index ->
-                val angle = (index * 30f)
-                SparkleParticle(
-                    delay = (index * 50L),
-                    modifier = Modifier
-                        .offset(
-                            x = (50 * kotlin.math.cos(Math.toRadians(angle.toDouble()))).dp,
-                            y = (50 * kotlin.math.sin(Math.toRadians(angle.toDouble()))).dp
-                        )
-                )
-            }
-        }
-    }
 }
