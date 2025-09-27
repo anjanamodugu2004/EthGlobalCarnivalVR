@@ -11,7 +11,10 @@ GameObject:
   - component: {fileID: 574720605684083922}
   - component: {fileID: 1200490690052256929}
   - component: {fileID: 1762537258342191623}
-  - component: {fileID: 3675673609273988052}
+  - component: {fileID: 7356669622316231354}
+  - component: {fileID: -3628833784070515140}
+  - component: {fileID: 6303988137723106818}
+  - component: {fileID: 3026915922525221966}
   m_Layer: 0
   m_Name: throwing_dart
   m_TagString: Untagged
@@ -27,13 +30,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2033748665361638999}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.018679678, y: 0.7839068, z: -0.023612307, w: 0.6201481}
-  m_LocalPosition: {x: -5.98, y: 1.64, z: 10.67}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: -0.00032233298, y: 0.9994894, z: -0.03010594, w: 0.010701206}
+  m_LocalPosition: {x: -14.946, y: 2.212, z: -5.489}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0.794, y: 103.282, z: -3.358}
+  m_LocalEulerAnglesHint: {x: 3.45, y: 178.771, z: -0.074}
 --- !u!33 &1200490690052256929
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -84,8 +87,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &3675673609273988052
-CapsuleCollider:
+--- !u!65 &7356669622316231354
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,8 +105,78 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 4.94495
-  m_Height: 1.8895
-  m_Direction: 1
-  m_Center: {x: -0.0011491297, y: -0.0004500017, z: 4.7837505}
+  serializedVersion: 3
+  m_Size: {x: 1.8895006, y: 1.8895, z: 9.8899}
+  m_Center: {x: -0.0011500835, y: -0.0004500017, z: 4.7837505}
+--- !u!114 &-3628833784070515140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033748665361638999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43f86b14a27b52f4f9298c33015b5c26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _transferOnSecondSelection: 1
+  _addNewPointsToFront: 0
+  _forwardElement: {fileID: 0}
+  _oneGrabTransformer: {fileID: 0}
+  _twoGrabTransformer: {fileID: 0}
+  _targetTransform: {fileID: 0}
+  _maxGrabPoints: -1
+  _rigidbody: {fileID: 3026915922525221966}
+  _kinematicWhileSelected: 1
+  _throwWhenUnselected: 1
+--- !u!114 &6303988137723106818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033748665361638999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a1bc992571301d4a9602ac95ef4c71a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interactorFilters: []
+  _maxInteractors: -1
+  _maxSelectingInteractors: -1
+  _data: {fileID: 0}
+  _pointableElement: {fileID: -3628833784070515140}
+  _rigidbody: {fileID: 3026915922525221966}
+  _grabSource: {fileID: 0}
+  _useClosestPointAsGrabSource: 0
+  _releaseDistance: 0
+  _resetGrabOnGrabsUpdated: 1
+  _physicsGrabbable: {fileID: 0}
+--- !u!54 &3026915922525221966
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033748665361638999}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 2
