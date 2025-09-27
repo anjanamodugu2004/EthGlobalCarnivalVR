@@ -106,12 +106,10 @@ fun WalletScreen(
 
             // Balance
             item {
-                BalanceCard(
-                    balance = viewModel.balance,
-                    chainSymbol = viewModel.selectedChain.symbol,
-                    chainName = viewModel.selectedChain.name,
-                    isLoading = viewModel.isLoadingWalletData,
-                    onViewTokensClick = { showTokensDialog = true }
+                PowerMeterBalance(
+                    balance = viewModel.balance?.displayValue ?: "0",
+                    symbol = viewModel.balance?.symbol ?: viewModel.selectedChain.symbol,
+                    isLoading = viewModel.isLoadingWalletData
                 )
             }
 
@@ -188,15 +186,17 @@ fun WalletScreen(
                         isVisible = true
                     }
 
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = fadeIn(tween(400)) + slideInHorizontally(
-                            tween(400),
-                            initialOffsetX = { it / 3 }
-                        )
-                    ) {
-                        TokenItem(token = token)
-                    }
+                    InventoryTokenItem(
+                        tokenName = token.name ?: "Unknown Token",
+                        tokenSymbol = token.symbol ?: "",
+                        balance = token.balanceFormatted ?: "0",
+                        rarity = when {
+                            token.balanceFormatted?.toFloatOrNull() ?: 0f > 1000f -> "legendary"
+                            token.balanceFormatted?.toFloatOrNull() ?: 0f > 100f -> "epic"
+                            token.balanceFormatted?.toFloatOrNull() ?: 0f > 10f -> "rare"
+                            else -> "common"
+                        }
+                    )
                 }
             }
         }

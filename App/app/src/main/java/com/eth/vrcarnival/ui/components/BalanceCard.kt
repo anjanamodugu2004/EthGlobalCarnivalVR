@@ -1,3 +1,4 @@
+/*
 package com.eth.vrcarnival.ui.components
 
 import androidx.compose.foundation.layout.*
@@ -90,4 +91,4 @@ fun BalanceCard(
             }
         }
     }
-}
+}*/

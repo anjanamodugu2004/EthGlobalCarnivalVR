@@ -80,6 +80,8 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
     implementation("com.airbnb.android:lottie-compose:6.1.0")
 
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
