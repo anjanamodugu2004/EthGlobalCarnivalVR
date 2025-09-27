@@ -16,6 +16,7 @@ public class CarouselRide : MonoBehaviour
     private int playerScore = 100;
     private bool isRiding = false;
     private Transform playerRig;
+    private Transform originalParent;
     void Start()
     {
         PersistentCameraRig rigInstance = FindObjectOfType<PersistentCameraRig>();
@@ -30,14 +31,17 @@ public class CarouselRide : MonoBehaviour
         if (playerScore < rideCost) return;
         playerScore -= rideCost;
         UpdateScoreUI();
-        playerRig.position = seatPosition.position;
-        playerRig.rotation = seatPosition.rotation;
+        originalParent = playerRig.parent;
+        playerRig.SetParent(seatPosition);
+        playerRig.localPosition = Vector3.zero;
+        playerRig.localRotation = Quaternion.identity;
         StartCoroutine(RideCoroutine());
     }
     IEnumerator RideCoroutine()
     {
         isRiding = true;
         yield return new WaitForSeconds(rideDuration);
+        playerRig.SetParent(originalParent);
         playerRig.position = exitPosition.position;
         playerRig.rotation = exitPosition.rotation;
         isRiding = false;
