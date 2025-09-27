@@ -1,29 +1,29 @@
 using UnityEngine;
-using System.Collections;
+
 public class DartSpawner : MonoBehaviour
 {
     public GameObject dartPrefab;
-    public float spawnInterval = 2f; 
     public Transform spawnPoint;
     public JokerGameManager gameManager;
-    private bool spawning = true;
-    void Start()
+
+    private GameObject currentDart;
+
+    void Update()
     {
-        StartCoroutine(SpawnDarts());//this will constantly spawn the darts in every 2 seconds
-    }
-    IEnumerator SpawnDarts()
-    {
-        while (spawning)
+        // Only spawn if the game is active AND no dart exists
+        if (gameManager.isGameActive && currentDart == null)
         {
-            if (gameManager.isGameActive)
-            {
-                Instantiate(dartPrefab, spawnPoint.position, Quaternion.identity);//the darts will spawn based on the position and rotation of the spawner component(as in where we want)
-            }
-            yield return new WaitForSeconds(spawnInterval);
+            currentDart = Instantiate(dartPrefab, spawnPoint.position, spawnPoint.rotation);
         }
     }
-    public void StopSpawning()
+
+    // Optional: function to manually trigger throw from another script/input
+    public void ThrowCurrentDart(Vector3 direction)
     {
-        spawning = false;
+        if (currentDart != null)
+        {
+            currentDart.GetComponent<Dart>().Throw(direction);
+            currentDart = null; // clear reference so next dart spawns
+        }
     }
 }
