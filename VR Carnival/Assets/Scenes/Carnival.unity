@@ -1332,6 +1332,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: circus tent
       objectReference: {fileID: 0}
+    - target: {fileID: 2756507402584736968, guid: e1fe0a8b05def4b7aad7b87511028ea1, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2756507402584736968, guid: e1fe0a8b05def4b7aad7b87511028ea1, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2756507402584736968, guid: e1fe0a8b05def4b7aad7b87511028ea1, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2756507402584736968, guid: e1fe0a8b05def4b7aad7b87511028ea1, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4754567965702864595, guid: e1fe0a8b05def4b7aad7b87511028ea1, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8154883345141257923, guid: e1fe0a8b05def4b7aad7b87511028ea1, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -1628,6 +1648,72 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3894124605447773790, guid: 0feba03cd86bc8a4e8f7ada56dfaec0e, type: 3}
   m_PrefabInstance: {fileID: 1276409030}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &841725152
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 841725155}
+  - component: {fileID: 841725154}
+  - component: {fileID: 841725153}
+  m_Layer: 0
+  m_Name: TentPortalTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &841725153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841725152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c9c9f51bad74ce478bc9f258cfaa8fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &841725154
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841725152}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.28947392, y: 0.2824582, z: 2.0089264}
+  m_Center: {x: 0.3552714, y: 0.016857684, z: 0.05391761}
+--- !u!4 &841725155
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841725152}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.015031872, z: -0, w: 0.9998871}
+  m_LocalPosition: {x: 7.944, y: 0.613, z: 14.314}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 1.723, z: 0}
 --- !u!4 &861352048 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6035573537685846337, guid: 0feba03cd86bc8a4e8f7ada56dfaec0e, type: 3}
@@ -7059,3 +7145,4 @@ SceneRoots:
   - {fileID: 1860629259}
   - {fileID: 1705915569}
   - {fileID: 1611837359}
+  - {fileID: 841725155}
