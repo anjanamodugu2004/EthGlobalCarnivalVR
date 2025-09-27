@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             VrCarnivalTheme {
-                Surface (
+                Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = "auth"
+                        startDestination = if (viewModel.authResponse != null) "wallet" else "auth"
                     ) {
                         composable("auth") {
                             AuthScreen(
@@ -45,7 +45,14 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("wallet") {
-                            WalletScreen(viewModel = viewModel)
+                            WalletScreen(
+                                viewModel = viewModel,
+                                onLogout = {
+                                    navController.navigate("auth") {
+                                        popUpTo("wallet") { inclusive = true }
+                                    }
+                                }
+                            )
                         }
                     }
                 }
