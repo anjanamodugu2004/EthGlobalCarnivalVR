@@ -886,6 +886,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: '[BuildingBlock] Camera Rig'
       objectReference: {fileID: 0}
+    - target: {fileID: 4498228932834535457, guid: fa16d5bbcd69f8e4d887ea681ebca285, type: 3}
+      propertyPath: m_TagString
+      value: MainCameraRig
+      objectReference: {fileID: 0}
     - target: {fileID: 4608465487679818798, guid: fa16d5bbcd69f8e4d887ea681ebca285, type: 3}
       propertyPath: m_IsActive
       value: 0

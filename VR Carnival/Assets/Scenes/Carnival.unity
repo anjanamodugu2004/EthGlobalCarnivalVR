@@ -2492,12 +2492,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471378780}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.271, y: 1.611, z: -21.625}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.6252892, y: -2.2222953, z: 0.3062448}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1907639408}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &477794530
 GameObject:
@@ -6654,7 +6654,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7557940206067582529, guid: 0feba03cd86bc8a4e8f7ada56dfaec0e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 471378781}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8224953927900450762, guid: 0feba03cd86bc8a4e8f7ada56dfaec0e, type: 3}
       insertIndex: -1
@@ -9458,8 +9461,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 335334133}
-        m_TargetAssemblyTypeName: CarouselRide, Assembly-CSharp
+      - m_Target: {fileID: 809948189}
+        m_TargetAssemblyTypeName: FerrisWheelRide, Assembly-CSharp
         m_MethodName: StartRide
         m_Mode: 1
         m_Arguments:
@@ -14375,5 +14378,4 @@ SceneRoots:
   - {fileID: 635258146}
   - {fileID: 1741128060}
   - {fileID: 809948190}
-  - {fileID: 471378781}
   - {fileID: 579891930}

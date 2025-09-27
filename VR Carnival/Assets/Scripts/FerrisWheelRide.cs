@@ -25,7 +25,7 @@ public class FerrisWheelRide : MonoBehaviour
         rideButton.onClick.AddListener(StartRide);
         UpdateScoreUI();
     }
-    void StartRide()
+  public  void StartRide()
     {
         if (isRiding) return;
         if (playerScore < rideCost) return;
