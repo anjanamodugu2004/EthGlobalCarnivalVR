@@ -60,7 +60,6 @@ fun AuthScreen(
                 )
             )
     ) {
-        // Single subtle background accent
         SubtleBackgroundAccent()
 
         AnimatedVisibility(
@@ -79,12 +78,10 @@ fun AuthScreen(
                         .fillMaxWidth()
                         .padding(32.dp)
                 ) {
-                    // Clean app branding
                     AppLogo()
 
                     Spacer(modifier = Modifier.height(48.dp))
 
-                    // Main auth card - much cleaner
                     CleanAuthCard(
                         email = email,
                         onEmailChange = { email = it },
@@ -95,7 +92,6 @@ fun AuthScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Clean error display
                     viewModel.error?.let { error ->
                         CleanErrorCard(error = error)
                     }
@@ -112,7 +108,6 @@ private fun SubtleBackgroundAccent() {
             .fillMaxSize()
             .padding(64.dp)
     ) {
-        // Single elegant pulse in corner
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -132,7 +127,6 @@ private fun AppLogo() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Clean logo design
         Card(
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
@@ -233,7 +227,6 @@ private fun CleanAuthCard(
                 enabled = !viewModel.isLoading
             )
 
-            // OTP field with smooth animation
             AnimatedVisibility(
                 visible = viewModel.isOtpSent,
                 enter = fadeIn(tween(500)) + expandVertically(tween(500)),
@@ -280,7 +273,6 @@ private fun CleanAuthCard(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Clean action button
             CleanActionButton(
                 onClick = {
                     if (viewModel.isOtpSent) {
@@ -298,7 +290,6 @@ private fun CleanAuthCard(
                 text = if (viewModel.isOtpSent) "Verify" else "Continue"
             )
 
-            // Back option for OTP
             AnimatedVisibility(
                 visible = viewModel.isOtpSent && !viewModel.isLoading,
                 enter = fadeIn(tween(400)),

@@ -1,6 +1,5 @@
 package com.eth.vrcarnival.data.models
 
-// API Response Wrappers
 data class ApiResponse<T>(
     val result: T
 )
@@ -16,11 +15,6 @@ data class ListTokenInfo(
     val symbol: String?,
     val decimals: Int?,
     val chainId: Int?
-)
-
-data class ListTokensResponse(
-    val tokens: List<ListTokenInfo>,
-    val pagination: Pagination
 )
 
 data class NFTsResponse(
@@ -137,4 +131,49 @@ data class TransferCarTokenResponse(
     val transactionHash: String?,
     val transactionId: String?,
     val message: String?
+)
+
+
+data class UnityIntegrationRequest(
+    val email: String,
+    val walletAddress: String
+)
+
+data class ListTokensResponse(
+    val tokens: List<ListTokenInfo>,
+    val pagination: Pagination
+)
+
+data class NFTContractResponse(
+    val contractAddress: String,
+    val contractType: String,
+    val walletAddress: String,
+    val data: NFTBalanceData?
+)
+
+data class NFTBalanceData(
+    val tokenId: String,
+    val balance: String
+)
+
+data class NFTMetadataResponse(
+    val contractAddress: String,
+    val tokenId: String,
+    val tokenURI: String,
+    val metadata: NFTMetadata,
+    val resolvedImageUrl: String
+)
+
+data class NFTMetadata(
+    val name: String,
+    val description: String,
+    val image: String,
+    val attributes: List<NFTAttribute>,
+    val price_amount: String? = null,
+    val price_currency: String? = null
+)
+
+data class NFTAttribute(
+    val trait_type: String,
+    val value: String
 )

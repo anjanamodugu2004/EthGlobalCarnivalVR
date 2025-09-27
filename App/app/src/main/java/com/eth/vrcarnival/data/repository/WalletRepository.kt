@@ -17,9 +17,6 @@ class WalletRepository @Inject constructor(
     suspend fun getTokens(address: String, chainId: Int) =
         apiService.getTokens(address, chainId)
 
-    suspend fun getNFTs(address: String, chainId: Int) =
-        apiService.getNFTs(address, chainId)
-
     suspend fun getBalance(address: String, chainId: Int) =
         apiService.getBalance(address, chainId)
 
@@ -37,4 +34,13 @@ class WalletRepository @Inject constructor(
 
     suspend fun transferCarTokens(token: String, request: TransferCarTokenRequest) =
         apiService.transferCarTokens("Bearer $token", request)
+
+    suspend fun sendWalletToUnity(email: String, walletAddress: String) =
+        apiService.sendWalletToUnity(UnityIntegrationRequest(email, walletAddress))
+
+    suspend fun getUniversalNFTs(contractAddress: String, walletAddress: String) =
+        apiService.getUniversalNFTs(contractAddress, walletAddress)
+
+    suspend fun getNFTMetadata(contractAddress: String, tokenId: String) =
+        apiService.getNFTMetadata(contractAddress, tokenId)
 }
