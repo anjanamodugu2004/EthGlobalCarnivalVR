@@ -4,22 +4,34 @@ public class JokerController : MonoBehaviour
 {
     public float moveSpeed = 1.5f;
     public float moveHeight = 1.5f;
-    public float baseY; 
+    public float visibleThreshold = 0.2f; //how far above shelf before visible
     private Vector3 startPos;
-    private bool isActive = true;
+    private bool isActive = false;
+    private Renderer rend;
+    private Collider col;
     void Start()
     {
         startPos = transform.position;
-        baseY = startPos.y;
+        rend = GetComponentInChildren<Renderer>();
+        col = GetComponent<Collider>();
     }
+//joker hides when beneath the shelf or table level and only visible when above
     void Update()
     {
-        if (!isActive) return;
-        float newY = baseY + Mathf.PingPong(Time.time * moveSpeed, moveHeight);
+        if (isActive) return;
+        float newY = startPos.y + Mathf.PingPong(Time.time * moveSpeed, moveHeight);
         transform.position = new Vector3(startPos.x, newY, startPos.z);
-//joker hides when beneath the shelf or table level and only visible when above
-        Renderer rend = GetComponentInChildren<Renderer>();
-        rend.enabled = (transform.position.y > baseY + 0.2f); 
+       //moving up down and render only when above the shelf or table level
+        if (transform.position.y > startPos.y + visibleThreshold)
+        {
+            rend.enabled = true;
+            col.enabled = true;
+        }
+        else
+        {
+            rend.enabled = false;
+            col.enabled = false;
+        }
     }
     public void OnHit()
     {
@@ -28,12 +40,11 @@ public class JokerController : MonoBehaviour
     }
     IEnumerator RespawnJoker()
     {
-        //using to make sure the joker is inactive for 2 seconds and there exists a cooldown period in between
         isActive = false;
-        GetComponentInChildren<Renderer>().enabled = false;
-        GetComponent<Collider>().enabled = false;
-        yield return new WaitForSeconds(2f); 
+        rend.enabled = false;
+        col.enabled = false;
+//using to make sure the joker is inactive for 2 seconds and there exists a cooldown period in between
+        yield return new WaitForSeconds(2f);
         isActive = true;
-        GetComponent<Collider>().enabled = true;
     }
 }
