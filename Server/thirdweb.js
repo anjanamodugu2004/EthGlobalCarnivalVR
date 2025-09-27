@@ -420,4 +420,326 @@ router.post("/contracts/car-token/transfer", async (req, res) => {
   }
 });
 
+/**
+ * 1️⃣2️⃣ Get all tokens from ERC-1155 contract 
+ * GET /v1/contracts/{contractAddress}/erc1155/get-all
+ */
+router.get("/contracts/:contractAddress/erc1155/get-all", async (req, res) => {
+  const { contractAddress } = req.params;
+  const { limit = 100, page = 1 } = req.query;
+
+  try {
+    // For ERC-1155, we need to use contract read to get token info
+    const contractReadData = {
+      calls: [
+        {
+          contractAddress: contractAddress,
+          method: "function uri(uint256 id) view returns (string)",
+          params: ["0"] // Start with token ID 0
+        }
+      ],
+      chainId: 11155111
+    };
+
+    const data = await callThirdwebAPI('/v1/contracts/read', "POST", contractReadData);
+    res.json({
+      contractAddress: contractAddress,
+      contractType: "ERC-1155",
+      message: "ERC-1155 tokens found",
+      tokenURI: data.result?.[0]?.data || "No URI found",
+      rawResponse: data
+    });
+  } catch (err) {
+    console.error("Failed to fetch ERC-1155 tokens:", err);
+    res.status(500).json({ error: "Failed to fetch ERC-1155 tokens", details: err.message });
+  }
+});
+
+/**
+ * 1️⃣3️⃣ Get ERC-1155 token balance for specific wallet
+ * POST /v1/contracts/{contractAddress}/erc1155/balance
+ */
+router.post("/contracts/:contractAddress/erc1155/balance", async (req, res) => {
+  const { contractAddress } = req.params;
+  const { walletAddress, tokenId = "0" } = req.body;
+
+  try {
+    if (!walletAddress) {
+      return res.status(400).json({ error: "walletAddress is required" });
+    }
+
+    const contractReadData = {
+      calls: [
+        {
+          contractAddress: contractAddress,
+          method: "function balanceOf(address account, uint256 id) view returns (uint256)",
+          params: [walletAddress, tokenId]
+        },
+        {
+          contractAddress: contractAddress,
+          method: "function uri(uint256 id) view returns (string)",
+          params: [tokenId]
+        }
+      ],
+      chainId: 11155111
+    };
+
+    const data = await callThirdwebAPI('/v1/contracts/read', "POST", contractReadData);
+    
+    res.json({
+      contractAddress: contractAddress,
+      walletAddress: walletAddress,
+      tokenId: tokenId,
+      balance: data.result?.[0]?.data || "0",
+      tokenURI: data.result?.[1]?.data || "No URI found",
+      rawResponse: data
+    });
+  } catch (err) {
+    console.error("Failed to fetch ERC-1155 balance:", err);
+    res.status(500).json({ error: "Failed to fetch ERC-1155 balance", details: err.message });
+  }
+});
+
+/**
+ * 1️⃣4️⃣ Get ERC-1155 batch balances for multiple tokens
+ * POST /v1/contracts/{contractAddress}/erc1155/batch-balance
+ */
+router.post("/contracts/:contractAddress/erc1155/batch-balance", async (req, res) => {
+  const { contractAddress } = req.params;
+  const { walletAddress, tokenIds = ["0", "1", "2"] } = req.body;
+
+  try {
+    if (!walletAddress) {
+      return res.status(400).json({ error: "walletAddress is required" });
+    }
+
+    // Create calls for each token ID
+    const calls = tokenIds.map(tokenId => ({
+      contractAddress: contractAddress,
+      method: "function balanceOf(address account, uint256 id) view returns (uint256)",
+      params: [walletAddress, tokenId.toString()]
+    }));
+
+    const contractReadData = {
+      calls: calls,
+      chainId: 11155111
+    };
+
+    const data = await callThirdwebAPI('/v1/contracts/read', "POST", contractReadData);
+    
+    // Format response with token ID and balance pairs
+    const balances = tokenIds.map((tokenId, index) => ({
+      tokenId: tokenId,
+      balance: data.result?.[index]?.data || "0",
+      success: data.result?.[index]?.success || false
+    }));
+
+    res.json({
+      contractAddress: contractAddress,
+      walletAddress: walletAddress,
+      balances: balances,
+      rawResponse: data
+    });
+  } catch (err) {
+    console.error("Failed to fetch ERC-1155 batch balances:", err);
+    res.status(500).json({ error: "Failed to fetch ERC-1155 batch balances", details: err.message });
+  }
+});
+
+/**
+ * 1️⃣5️⃣ Transfer ERC-1155 tokens
+ * POST /v1/contracts/{contractAddress}/erc1155/transfer
+ */
+router.post("/contracts/:contractAddress/erc1155/transfer", async (req, res) => {
+  const { contractAddress } = req.params;
+  const { fromAddress, toAddress, tokenId, amount } = req.body;
+
+  try {
+    if (!fromAddress || !toAddress || tokenId === undefined || !amount) {
+      return res.status(400).json({
+        error: "Missing required fields: fromAddress, toAddress, tokenId, amount"
+      });
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: "Authorization token required" });
+    }
+
+    const headers = {
+      "x-client-id": CLIENT_ID,
+      "Authorization": authHeader
+    };
+
+    const contractWriteData = {
+      calls: [
+        {
+          contractAddress: contractAddress,
+          method: "function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes data)",
+          params: [fromAddress, toAddress, tokenId.toString(), amount.toString(), "0x"]
+        }
+      ],
+      chainId: 11155111,
+      from: fromAddress
+    };
+
+    const data = await callThirdwebAPI('/v1/contracts/write', "POST", contractWriteData, headers);
+    
+    res.json({
+      success: true,
+      contractAddress: contractAddress,
+      tokenId: tokenId,
+      amount: amount,
+      from: fromAddress,
+      to: toAddress,
+      transactionId: data.result?.transactionIds?.[0] || "success",
+      fullResponse: data
+    });
+  } catch (err) {
+    console.error("Failed to transfer ERC-1155 tokens:", err);
+    res.status(500).json({ error: "Failed to transfer ERC-1155 tokens", details: err.message });
+  }
+});
+
+/**
+ * 1️⃣6️⃣ Universal NFT endpoint - detects contract type and returns appropriate data
+ * GET /v1/contracts/{contractAddress}/universal-nfts
+ */
+router.get("/contracts/:contractAddress/universal-nfts", async (req, res) => {
+  const { contractAddress } = req.params;
+  const { walletAddress } = req.query;
+
+  try {
+    // First, detect if it's ERC-721 or ERC-1155
+    const detectionData = {
+      calls: [
+        {
+          contractAddress: contractAddress,
+          method: "function supportsInterface(bytes4 interfaceId) view returns (bool)",
+          params: ["0x80ac58cd"] // ERC-721 interface ID
+        },
+        {
+          contractAddress: contractAddress,
+          method: "function supportsInterface(bytes4 interfaceId) view returns (bool)",
+          params: ["0xd9b67a26"] // ERC-1155 interface ID
+        }
+      ],
+      chainId: 11155111
+    };
+
+    const detection = await callThirdwebAPI('/v1/contracts/read', "POST", detectionData);
+    
+    const isERC721 = detection.result?.[0]?.data === true;
+    const isERC1155 = detection.result?.[1]?.data === true;
+
+    let response = {
+      contractAddress: contractAddress,
+      contractType: isERC721 ? "ERC-721" : isERC1155 ? "ERC-1155" : "Unknown",
+      walletAddress: walletAddress || "Not specified"
+    };
+
+    if (isERC721) {
+      // Get ERC-721 NFTs
+      if (walletAddress) {
+        const params = new URLSearchParams();
+        params.append('chainId', 11155111);
+        params.append('contractAddresses', contractAddress);
+        params.append('limit', 50);
+        
+        const nftData = await callThirdwebAPI(`/v1/wallets/${walletAddress}/nfts?${params.toString()}`);
+        response.data = nftData;
+      } else {
+        response.message = "For ERC-721 data, provide walletAddress as query parameter";
+      }
+    } else if (isERC1155) {
+      // Get ERC-1155 balance for token ID 0
+      if (walletAddress) {
+        const balanceData = {
+          calls: [
+            {
+              contractAddress: contractAddress,
+              method: "function balanceOf(address account, uint256 id) view returns (uint256)",
+              params: [walletAddress, "0"]
+            }
+          ],
+          chainId: 11155111
+        };
+        
+        const balance = await callThirdwebAPI('/v1/contracts/read', "POST", balanceData);
+        response.data = {
+          tokenId: "0",
+          balance: balance.result?.[0]?.data || "0"
+        };
+      } else {
+        response.message = "For ERC-1155 data, provide walletAddress as query parameter";
+      }
+    }
+
+    res.json(response);
+  } catch (err) {
+    console.error("Failed to get universal NFT data:", err);
+    res.status(500).json({ error: "Failed to get universal NFT data", details: err.message });
+  }
+});
+
+/**
+ * 1️⃣7️⃣ Get ERC-1155 token metadata from IPFS
+ * GET /v1/contracts/{contractAddress}/erc1155/metadata/{tokenId}
+ */
+router.get("/contracts/:contractAddress/erc1155/metadata/:tokenId", async (req, res) => {
+  const { contractAddress, tokenId } = req.params;
+
+  try {
+    // First get the tokenURI
+    const contractReadData = {
+      calls: [
+        {
+          contractAddress: contractAddress,
+          method: "function uri(uint256 id) view returns (string)",
+          params: [tokenId]
+        }
+      ],
+      chainId: 11155111
+    };
+
+    const uriData = await callThirdwebAPI('/v1/contracts/read', "POST", contractReadData);
+    const tokenURI = uriData.result?.[0]?.data;
+
+    if (!tokenURI) {
+      return res.status(404).json({ error: "Token URI not found" });
+    }
+
+    // Convert IPFS URL to HTTP gateway URL
+    let metadataUrl = tokenURI;
+    if (tokenURI.startsWith('ipfs://')) {
+      metadataUrl = tokenURI.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    }
+
+    // Fetch metadata from IPFS
+    const metadataResponse = await fetch(metadataUrl);
+    if (!metadataResponse.ok) {
+      throw new Error(`Failed to fetch metadata: ${metadataResponse.status}`);
+    }
+
+    const metadata = await metadataResponse.json();
+
+    // Convert image IPFS URL if needed
+    if (metadata.image && metadata.image.startsWith('ipfs://')) {
+      metadata.image = metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    }
+
+    res.json({
+      contractAddress: contractAddress,
+      tokenId: tokenId,
+      tokenURI: tokenURI,
+      metadata: metadata,
+      resolvedImageUrl: metadata.image || null
+    });
+
+  } catch (err) {
+    console.error("Failed to fetch token metadata:", err);
+    res.status(500).json({ error: "Failed to fetch token metadata", details: err.message });
+  }
+});
+
 module.exports = router;
