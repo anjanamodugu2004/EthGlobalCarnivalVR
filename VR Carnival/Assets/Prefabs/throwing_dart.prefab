@@ -11,8 +11,7 @@ GameObject:
   - component: {fileID: 574720605684083922}
   - component: {fileID: 1200490690052256929}
   - component: {fileID: 1762537258342191623}
-  - component: {fileID: 2570069334553282681}
-  - component: {fileID: 5119517814864235134}
+  - component: {fileID: 3675673609273988052}
   m_Layer: 0
   m_Name: throwing_dart
   m_TagString: Untagged
@@ -28,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2033748665361638999}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.005191277, y: 0.71479285, z: 0.009002299, w: 0.69925904}
-  m_LocalPosition: {x: -14.52, y: 1.92, z: -2.4}
-  m_LocalScale: {x: 0.08, y: 0.08, z: 0.08}
-  m_ConstrainProportionsScale: 1
+  m_LocalRotation: {x: -0.018679678, y: 0.7839068, z: -0.023612307, w: 0.6201481}
+  m_LocalPosition: {x: -5.98, y: 1.64, z: 10.67}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -0.321, y: 91.256, z: 1.147}
+  m_LocalEulerAnglesHint: {x: 0.794, y: 103.282, z: -3.358}
 --- !u!33 &1200490690052256929
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -85,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2570069334553282681
-BoxCollider:
+--- !u!136 &3675673609273988052
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -103,18 +102,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.1799662, y: 0.20956442, z: 0.15939365}
-  m_Center: {x: -0.0148096485, y: 0.027767489, z: -0.081481166}
---- !u!114 &5119517814864235134
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2033748665361638999}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b6cc2d4f809dbb42aba714f9fe24e2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  serializedVersion: 2
+  m_Radius: 4.94495
+  m_Height: 1.8895
+  m_Direction: 1
+  m_Center: {x: -0.0011491297, y: -0.0004500017, z: 4.7837505}
