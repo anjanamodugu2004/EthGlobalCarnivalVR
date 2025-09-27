@@ -118,3 +118,23 @@ data class SendTokenResponse(
     val transactionHash: String?,
     val message: String?
 )
+
+data class CarTokenBalance(
+    val displayValue: String?,
+    val symbol: String?,
+    val name: String?,
+    val address: String?,
+    val decimals: Int?
+)
+
+data class TransferCarTokenRequest(
+    val toAddress: String,
+    val amount: String,
+    val fromAddress: String
+)
+
+data class TransferCarTokenResponse(
+    val transactionHash: String?,
+    val transactionId: String?,
+    val message: String?
+)
