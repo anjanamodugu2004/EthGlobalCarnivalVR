@@ -3,6 +3,7 @@ package com.eth.vrcarnival.ui.screens
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ import com.eth.vrcarnival.ui.theme.TextPrimary
 import com.eth.vrcarnival.ui.theme.TextSecondary
 import com.eth.vrcarnival.viewmodel.WalletViewModel
 import kotlinx.coroutines.delay
+import com.eth.vrcarnival.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,6 +116,18 @@ fun WalletScreen(
                     exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
                 ) {
                     LoadingCard()
+                }
+            }
+
+            if (viewModel.selectedChain.chainId == 11155111) {
+                viewModel.carTokenBalance?.let { carToken ->
+                    item {
+                        CarTokenItem(
+                            tokenName = carToken.name ?: "Carnival Token",
+                            tokenSymbol = carToken.symbol ?: "CAR",
+                            balance = carToken.displayValue ?: "0"
+                        )
+                    }
                 }
             }
 
@@ -233,6 +248,13 @@ fun WalletScreen(
         viewModel.sendTokenSuccess?.let { txId ->
             Toast.makeText(context, "Transaction sent: ${txId.take(8)}...", Toast.LENGTH_LONG).show()
             viewModel.clearSendTokenSuccess()
+        }
+    }
+
+    LaunchedEffect(viewModel.sendCarTokenSuccess) {
+        viewModel.sendCarTokenSuccess?.let { txId ->
+            Toast.makeText(context, "CAR token sent: ${txId.take(8)}...", Toast.LENGTH_LONG).show()
+            viewModel.sendCarTokenSuccess = null
         }
     }
 
@@ -485,6 +507,7 @@ fun SendTokenDialog(
 ) {
     var recipientAddress by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
+    var selectedTokenType by remember { mutableStateOf("native") } // "native" or "car"
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -503,7 +526,7 @@ fun SendTokenDialog(
                 ) {
                     Column {
                         Text(
-                            text = "Send ${viewModel.selectedChain.symbol}",
+                            text = "Send Tokens",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -524,6 +547,38 @@ fun SendTokenDialog(
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // Token type selector (only show on Sepolia)
+                if (viewModel.selectedChain.chainId == 11155111 && viewModel.carTokenBalance != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            onClick = { selectedTokenType = "native" },
+                            label = { Text(viewModel.selectedChain.symbol) },
+                            selected = selectedTokenType == "native",
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            onClick = { selectedTokenType = "car" },
+                            label = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.carnival_token),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("CAR")
+                                }
+                            },
+                            selected = selectedTokenType == "car",
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 OutlinedTextField(
                     value = recipientAddress,
@@ -547,13 +602,23 @@ fun SendTokenDialog(
                 OutlinedTextField(
                     value = amount,
                     onValueChange = { amount = it },
-                    label = { Text("Amount (${viewModel.selectedChain.symbol})") },
+                    label = {
+                        Text("Amount (${if (selectedTokenType == "car") "CAR" else viewModel.selectedChain.symbol})")
+                    },
                     leadingIcon = {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
+                        if (selectedTokenType == "car") {
+                            Image(
+                                painter = painterResource(id = R.drawable.carnival_token),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth(),
@@ -562,23 +627,37 @@ fun SendTokenDialog(
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                viewModel.balance?.let { balance ->
-                    Text(
-                        text = "Available: ${balance.displayValue} ${balance.symbol ?: viewModel.selectedChain.symbol}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                    )
+                // Show available balance
+                if (selectedTokenType == "car") {
+                    viewModel.carTokenBalance?.let { carBalance ->
+                        Text(
+                            text = "Available: ${carBalance.displayValue} CAR",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = GoldTrophy,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
+                } else {
+                    viewModel.balance?.let { balance ->
+                        Text(
+                            text = "Available: ${balance.displayValue} ${balance.symbol ?: viewModel.selectedChain.symbol}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
                 }
 
                 AnimatedVisibility(
-                    visible = viewModel.isVerifyingTransaction,
+                    visible = viewModel.isVerifyingTransaction || viewModel.isSendingCarToken,
                     enter = fadeIn(tween(300)) + expandVertically(tween(300)),
                     exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
                 ) {
                     Card(
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            containerColor = if (selectedTokenType == "car")
+                                GoldTrophy.copy(alpha = 0.1f)
+                            else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -591,12 +670,12 @@ fun SendTokenDialog(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
-                                color = MaterialTheme.colorScheme.primary,
+                                color = if (selectedTokenType == "car") GoldTrophy else MaterialTheme.colorScheme.primary,
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Verifying transaction...",
+                                text = if (selectedTokenType == "car") "Sending CAR tokens..." else "Verifying transaction...",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -618,12 +697,17 @@ fun SendTokenDialog(
                     }
 
                     LoadingButton(
-                        text = "Send Transaction",
-                        isLoading = viewModel.isSendingToken,
+                        text = if (selectedTokenType == "car") "Send CAR" else "Send ${viewModel.selectedChain.symbol}",
+                        isLoading = if (selectedTokenType == "car") viewModel.isSendingCarToken else viewModel.isSendingToken,
                         onClick = {
-                            viewModel.sendTokens(recipientAddress, amount)
+                            if (selectedTokenType == "car") {
+                                viewModel.sendCarTokens(recipientAddress, amount)
+                            } else {
+                                viewModel.sendTokens(recipientAddress, amount)
+                            }
                         },
-                        enabled = recipientAddress.isNotBlank() && amount.isNotBlank() && !viewModel.isVerifyingTransaction,
+                        enabled = recipientAddress.isNotBlank() && amount.isNotBlank() &&
+                                !viewModel.isVerifyingTransaction && !viewModel.isSendingCarToken,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -771,6 +855,111 @@ fun AvailableTokensDialog(
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun CarTokenItem(
+    tokenName: String,
+    tokenSymbol: String,
+    balance: String,
+    modifier: Modifier = Modifier
+) {
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        isVisible = true
+    }
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(tween(400)) + slideInHorizontally(
+            tween(400),
+            initialOffsetX = { it / 3 }
+        )
+    ) {
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Transparent
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(RefinedGradients.legendaryGradient)
+                    .border(
+                        2.dp,
+                        GoldTrophy,
+                        RoundedCornerShape(16.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.carnival_token),
+                            contentDescription = "Carnival Token",
+                            modifier = Modifier.size(48.dp),
+                            colorFilter = null
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column {
+                            Text(
+                                text = tokenName,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = tokenSymbol,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = TextSecondary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(GoldTrophy)
+                                )
+                            }
+                        }
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(
+                            text = balance,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = GoldTrophy
+                        )
+                        Text(
+                            text = "CARNIVAL",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextAccent
+                        )
                     }
                 }
             }

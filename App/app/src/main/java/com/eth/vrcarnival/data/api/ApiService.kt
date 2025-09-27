@@ -56,4 +56,16 @@ interface ApiService {
         @Query("symbol") symbol: String? = null,
         @Query("name") name: String? = null
     ): Response<ApiResponse<TokensResponse>>
+
+    @GET("v1/wallets/{address}/token-balance")
+    suspend fun getCarTokenBalance(
+        @Path("address") address: String,
+        @Query("chainId") chainId: Int
+    ): Response<CarTokenBalance>
+
+    @POST("v1/contracts/car-token/transfer")
+    suspend fun transferCarTokens(
+        @Header("Authorization") authorization: String,
+        @Body request: TransferCarTokenRequest
+    ): Response<ApiResponse<TransferCarTokenResponse>>
 }

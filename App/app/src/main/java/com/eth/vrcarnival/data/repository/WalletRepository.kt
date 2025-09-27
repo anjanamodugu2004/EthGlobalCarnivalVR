@@ -31,4 +31,10 @@ class WalletRepository @Inject constructor(
 
     suspend fun listTokens(chainId: Int?, limit: Int = 20, page: Int = 1, symbol: String? = null) =
         apiService.listTokens(chainId, limit, page, symbol)
+
+    suspend fun getCarTokenBalance(address: String, chainId: Int) =
+        apiService.getCarTokenBalance(address, chainId)
+
+    suspend fun transferCarTokens(token: String, request: TransferCarTokenRequest) =
+        apiService.transferCarTokens("Bearer $token", request)
 }

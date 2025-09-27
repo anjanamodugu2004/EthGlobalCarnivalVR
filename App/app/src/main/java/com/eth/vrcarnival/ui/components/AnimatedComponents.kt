@@ -21,68 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eth.vrcarnival.ui.theme.*
-import kotlinx.coroutines.delay
-
-@Composable
-fun AnimatedGradientCard(
-    modifier: Modifier = Modifier,
-    borderGlow: Boolean = false,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    var visible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        delay(150)
-        visible = true
-    }
-
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(tween(500, easing = FastOutSlowInEasing)) +
-                slideInVertically(tween(500, easing = FastOutSlowInEasing), initialOffsetY = { it / 6 }),
-        modifier = modifier
-    ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(RefinedGradients.elegantCard)
-                    .then(
-                        if (borderGlow) {
-                            Modifier.border(
-                                1.dp,
-                                RefinedGradients.subtleBorder,
-                                RoundedCornerShape(16.dp)
-                            )
-                        } else {
-                            Modifier.border(
-                                0.5.dp,
-                                TextSecondary.copy(alpha = 0.2f),
-                                RoundedCornerShape(16.dp)
-                            )
-                        }
-                    )
-                    .padding(24.dp)
-            ) {
-                // Subtle background glow with your colors
-                if (borderGlow) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(RefinedGradients.glowEffect)
-                    )
-                }
-
-                Column(content = content)
-            }
-        }
-    }
-}
 
 @Composable
 fun ElegantPulse(

@@ -65,6 +65,14 @@ class WalletViewModel @Inject constructor(
     var isLoadingWalletData by mutableStateOf(false)
         private set
 
+    var carTokenBalance by mutableStateOf<CarTokenBalance?>(null)
+        private set
+
+    var isSendingCarToken by mutableStateOf(false)
+        private set
+
+    var sendCarTokenSuccess by mutableStateOf<String?>(null)
+
     var isInitializing by mutableStateOf(true)
         private set
 
@@ -123,6 +131,7 @@ class WalletViewModel @Inject constructor(
         nfts = emptyList()
         balance = null
         availableTokens = emptyList()
+        carTokenBalance = null
 
         // Load new data for selected chain
         loadWalletData()
@@ -189,6 +198,27 @@ class WalletViewModel @Inject constructor(
             loadTokens(auth.walletAddress)
             loadNFTs(auth.walletAddress)
             loadBalance(auth.walletAddress)
+            loadCarToken(auth.walletAddress)
+        }
+    }
+
+    private fun loadCarToken(address: String) {
+        // Only load CAR token on Sepolia testnet
+        if (selectedChain.chainId == 11155111) {
+            viewModelScope.launch {
+                try {
+                    val response = repository.getCarTokenBalance(address, selectedChain.chainId)
+                    if (response.isSuccessful) {
+                        carTokenBalance = response.body()
+                    }
+                } catch (e: Exception) {
+                    // Handle error silently for now
+                } finally {
+                    checkIfAllDataLoaded()
+                }
+            }
+        } else {
+            carTokenBalance = null
         }
     }
 
@@ -234,12 +264,65 @@ class WalletViewModel @Inject constructor(
         showSendDialog = true
     }
 
+
+    fun sendCarTokens(recipientAddress: String, quantity: String) {
+        authResponse?.let { auth ->
+            viewModelScope.launch {
+                isSendingCarToken = true
+                error = null
+                sendCarTokenSuccess = null
+
+                try {
+                    // Convert to wei (CAR token has 18 decimals)
+                    val quantityInWei = try {
+                        val quantityBigDecimal = quantity.toBigDecimal()
+                        val weiMultiplier = BigDecimal.TEN.pow(18)
+                        val weiAmount = quantityBigDecimal * weiMultiplier
+                        weiAmount.toBigInteger().toString()
+                    } catch (e: Exception) {
+                        error = "Invalid amount format"
+                        return@launch
+                    }
+
+                    val request = TransferCarTokenRequest(
+                        toAddress = recipientAddress,
+                        amount = quantityInWei,
+                        fromAddress = auth.walletAddress
+                    )
+
+                    val response = repository.transferCarTokens(auth.token, request)
+                    if (response.isSuccessful) {
+                        val result = response.body()?.result
+                        val transactionId = result?.transactionId ?: result?.transactionHash
+                        if (transactionId != null) {
+                            sendCarTokenSuccess = transactionId
+                            // Refresh CAR token balance
+                            loadCarToken(auth.walletAddress)
+                            delay(1500) // Show success briefly
+                            closeSendDialog()
+                        } else {
+                            error = "CAR token transfer failed - no transaction ID returned"
+                        }
+                    } else {
+                        error = "Failed to transfer CAR tokens: ${response.message()}"
+                    }
+                } catch (e: Exception) {
+                    error = "Network error: ${e.message}"
+                } finally {
+                    isSendingCarToken = false
+                }
+            }
+        }
+    }
+
     fun closeSendDialog() {
         showSendDialog = false
         // Reset states when closing
         sendTokenSuccess = null
+        sendCarTokenSuccess = null
         error = null
         isSendingToken = false
+        isSendingCarToken = false
         isVerifyingTransaction = false
     }
 
