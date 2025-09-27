@@ -8,7 +8,6 @@ public class CarouselRide : MonoBehaviour
     public Button rideButton;
     public TMP_Text scoreText;
     [Header("Player")]
-    public Transform player;
     public Transform seatPosition;
     public Transform exitPosition;
     [Header("Ride Settings")]
@@ -16,27 +15,31 @@ public class CarouselRide : MonoBehaviour
     public float rideDuration = 10f;
     private int playerScore = 100;
     private bool isRiding = false;
+    private Transform playerRig;
     void Start()
     {
+        PersistentCameraRig rigInstance = FindObjectOfType<PersistentCameraRig>();
+        if (rigInstance != null)
+            playerRig = rigInstance.transform;
         rideButton.onClick.AddListener(StartRide);
         UpdateScoreUI();
     }
-    public void StartRide()
+    void StartRide()
     {
         if (isRiding) return;
         if (playerScore < rideCost) return;
         playerScore -= rideCost;
         UpdateScoreUI();
-        player.position = seatPosition.position;
-        player.rotation = seatPosition.rotation;
+        playerRig.position = seatPosition.position;
+        playerRig.rotation = seatPosition.rotation;
         StartCoroutine(RideCoroutine());
     }
     IEnumerator RideCoroutine()
     {
         isRiding = true;
         yield return new WaitForSeconds(rideDuration);
-        player.position = exitPosition.position;
-        player.rotation = exitPosition.rotation;
+        playerRig.position = exitPosition.position;
+        playerRig.rotation = exitPosition.rotation;
         isRiding = false;
     }
     void UpdateScoreUI()
