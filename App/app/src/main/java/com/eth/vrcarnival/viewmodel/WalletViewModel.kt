@@ -5,16 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eth.vrcarnival.data.auth.AuthManager
 import com.eth.vrcarnival.data.models.*
 import com.eth.vrcarnival.data.repository.WalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class WalletViewModel @Inject constructor(
-    private val repository: WalletRepository
+    private val repository: WalletRepository,
+    private val authManager: AuthManager
 ) : ViewModel() {
 
     var isLoading by mutableStateOf(false)
@@ -55,6 +59,46 @@ class WalletViewModel @Inject constructor(
 
     var isLoadingWalletData by mutableStateOf(false)
         private set
+
+    var isInitializing by mutableStateOf(true)
+        private set
+
+    init {
+        initializeAuth()
+    }
+
+    private fun initializeAuth() {
+        viewModelScope.launch {
+            authManager.authFlow.collect { authState ->
+                if (authState.isAuthenticated) {
+                    authResponse = AuthResponse(
+                        isNewUser = false,
+                        token = authState.token!!,
+                        type = "existing",
+                        walletAddress = authState.walletAddress!!
+                    )
+                    loadWalletData()
+                    loadAvailableTokens()
+                }
+                isInitializing = false
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch(Dispatchers.IO) {
+            authManager.clearAuth()
+            withContext(Dispatchers.Main) {
+                authResponse = null
+                tokens = emptyList()
+                nfts = emptyList()
+                balance = null
+                availableTokens = emptyList()
+                error = null
+                isOtpSent = false
+            }
+        }
+    }
 
     fun getChains(): List<Chain> = listOf(
         Chain(1, "Ethereum Mainnet", "ETH"),
@@ -101,21 +145,35 @@ class WalletViewModel @Inject constructor(
     }
 
     fun verifyOtp(email: String, code: String) {
-        viewModelScope.launch {
-            isLoading = true
-            error = null
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                isLoading = true
+                error = null
+            }
 
             try {
                 val response = repository.verifyOtp(email, code)
-                if (response.isSuccessful) {
-                    authResponse = response.body()
-                } else {
-                    error = "Invalid OTP: ${response.message()}"
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { auth ->
+                            authResponse = auth
+                            // Save authentication
+                            launch(Dispatchers.IO) {
+                                authManager.saveAuth(auth.token, auth.walletAddress, email)
+                            }
+                        }
+                    } else {
+                        error = "Invalid OTP: ${response.message()}"
+                    }
                 }
             } catch (e: Exception) {
-                error = "Network error: ${e.message}"
+                withContext(Dispatchers.Main) {
+                    error = "Network error: ${e.message}"
+                }
             } finally {
-                isLoading = false
+                withContext(Dispatchers.Main) {
+                    isLoading = false
+                }
             }
         }
     }
