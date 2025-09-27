@@ -49,8 +49,6 @@ fun WalletScreen(
     onLogout: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    var showSendDialog by remember { mutableStateOf(false) }
-    var showTokensDialog by remember { mutableStateOf(false) }
     var showContent by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -119,6 +117,7 @@ fun WalletScreen(
                 }
             }
 
+            // CAR Token (only on Sepolia)
             if (viewModel.selectedChain.chainId == 11155111) {
                 viewModel.carTokenBalance?.let { carToken ->
                     item {
@@ -131,6 +130,7 @@ fun WalletScreen(
                 }
             }
 
+            // Native Balance
             item {
                 PowerMeterBalance(
                     balance = viewModel.balance?.displayValue ?: "0",
@@ -139,91 +139,20 @@ fun WalletScreen(
                 )
             }
 
-            // Tokens Section Header
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Assets",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    if (viewModel.tokens.isNotEmpty()) {
-                        Text(
-                            text = "${viewModel.tokens.size} assets",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+            // NFT Collection (only on Sepolia)
+            if (viewModel.selectedChain.chainId == 11155111 && viewModel.gameNFTs.isNotEmpty()) {
+                item {
+                    NFTCollectionGrid(nfts = viewModel.gameNFTs)
                 }
             }
 
-            // Tokens List or Empty State
-            if (viewModel.tokens.isEmpty() && !viewModel.isLoadingWalletData) {
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                Icons.Default.List,
-                                contentDescription = null,
-                                modifier = Modifier.size(48.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = "No assets found",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "on ${viewModel.selectedChain.name}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-            } else {
-                // Individual Token Items
-                itemsIndexed(viewModel.tokens) { index, token ->
-                    var isVisible by remember { mutableStateOf(false) }
-
-                    LaunchedEffect(Unit) {
-                        delay(index * 50L)
-                        isVisible = true
-                    }
-
-                    InventoryTokenItem(
-                        tokenName = token.name ?: "Unknown Token",
-                        tokenSymbol = token.symbol ?: "",
-                        balance = token.balanceFormatted ?: "0",
-                        rarity = when {
-                            token.balanceFormatted?.toFloatOrNull() ?: 0f > 1000f -> "legendary"
-                            token.balanceFormatted?.toFloatOrNull() ?: 0f > 100f -> "epic"
-                            token.balanceFormatted?.toFloatOrNull() ?: 0f > 10f -> "rare"
-                            else -> "common"
-                        }
-                    )
-                }
+            // Other Tokens
+            item {
+                TokensList(
+                    tokens = viewModel.tokens,
+                    chainName = viewModel.selectedChain.name,
+                    isLoading = viewModel.isLoadingWalletData
+                )
             }
         }
     }
@@ -236,14 +165,7 @@ fun WalletScreen(
         )
     }
 
-    if (showTokensDialog) {
-        AvailableTokensDialog(
-            tokens = viewModel.availableTokens,
-            chainName = viewModel.selectedChain.name,
-            onDismiss = { showTokensDialog = false }
-        )
-    }
-
+    // Toast Messages
     LaunchedEffect(viewModel.sendTokenSuccess) {
         viewModel.sendTokenSuccess?.let { txId ->
             Toast.makeText(context, "Transaction sent: ${txId.take(8)}...", Toast.LENGTH_LONG).show()
@@ -253,7 +175,7 @@ fun WalletScreen(
 
     LaunchedEffect(viewModel.sendCarTokenSuccess) {
         viewModel.sendCarTokenSuccess?.let { txId ->
-            Toast.makeText(context, "CAR token sent: ${txId.take(8)}...", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "CAR token sent successfully: ${txId.take(8)}...", Toast.LENGTH_LONG).show()
             viewModel.sendCarTokenSuccess = null
         }
     }
