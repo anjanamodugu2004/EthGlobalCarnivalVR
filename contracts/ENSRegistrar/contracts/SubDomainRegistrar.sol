@@ -3,37 +3,32 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// Minimal interface for the ENS Name Wrapper
+// --- INTERFACES ---
 interface INameWrapper {
     function setSubnodeOwner(bytes32 parentNode, string calldata label, address owner, uint32 fuses, uint64 expiry) external;
 }
 
-// Minimal interface for the ENS Registry
 interface IENSRegistry {
     function setResolver(bytes32 node, address resolver) external;
 }
 
+// --- CONTRACT ---
 /**
  * @title SubdomainRegistrar
- * @author Your Name
+ * @author VRCarnival
  * @notice A simple contract for a game admin to mint ENS subdomains as gamertags for players.
  * This contract is designed to be the owner of a parent name (e.g., "carnival.test")
  * within the ENS Name Wrapper, giving it permission to create subdomains.
  */
 contract SubdomainRegistrar is Ownable {
-    // The official ENS Name Wrapper contract address on Sepolia
     INameWrapper private immutable nameWrapper;
-    // The official ENS Registry contract address on Sepolia
     IENSRegistry private immutable ensRegistry;
 
-    // The namehash of the parent domain (e.g., namehash of "carnival.test")
-    // This is set by the owner after deployment.
-    bytes32 public parentNode;
 
-    // The address of the public resolver to be used for all gamertags.
-    // This is set by the owner after deployment.
+    bytes32 public parentNode;
     address public publicResolver;
 
+    // --- EVENTS ---
     event SubdomainRegistered(bytes32 indexed node, string label, address owner);
 
     /**
@@ -55,20 +50,24 @@ contract SubdomainRegistrar is Ownable {
         require(parentNode != bytes32(0), "Parent node not set");
         require(publicResolver != address(0), "Public resolver not set");
 
-        // Fuses are permissions for the Name Wrapper. 0 means no restrictions.
         uint32 fuses = 0;
-        // Expiry of 0 means the subdomain does not expire.
         uint64 expiry = 0;
 
-        // 1. Create the subdomain and assign ownership to the player
-        nameWrapper.setSubnodeOwner(parentNode, label, playerAddress, fuses, expiry);
+        // --- FIXED LOGIC ---
 
-        // 2. Calculate the namehash of the newly created subdomain (e.g., "player123.carnival.test")
+        // 1. Create the subdomain and assign ownership to THIS contract first
+        nameWrapper.setSubnodeOwner(parentNode, label, address(this), fuses, expiry);
+
+        // 2. Calculate the namehash of the newly created subdomain
         bytes32 subnode = keccak256(abi.encodePacked(parentNode, keccak256(bytes(label))));
 
-        // 3. Set the public resolver for the new subdomain
-        // This allows the player to set their address and other records.
+        // 3. Set the public resolver (this now works because the contract is the owner)
         ensRegistry.setResolver(subnode, publicResolver);
+
+        // 4. NOW, transfer ownership of the subdomain from this contract to the player
+        nameWrapper.setSubnodeOwner(parentNode, label, playerAddress, fuses, expiry);
+        
+        // --- END OF FIX ---
 
         emit SubdomainRegistered(subnode, label, playerAddress);
     }
