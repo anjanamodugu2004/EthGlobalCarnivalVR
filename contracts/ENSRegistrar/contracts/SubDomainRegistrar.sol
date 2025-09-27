@@ -2,6 +2,8 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+// IMPORT THE ERC1155HOLDER UTILITY
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 // --- INTERFACES ---
 interface INameWrapper {
@@ -13,6 +15,7 @@ interface IENSRegistry {
 }
 
 // --- CONTRACT ---
+// INHERIT FROM ERC1155HOLDER
 /**
  * @title SubdomainRegistrar
  * @author VRCarnival
@@ -20,15 +23,13 @@ interface IENSRegistry {
  * This contract is designed to be the owner of a parent name (e.g., "carnival.test")
  * within the ENS Name Wrapper, giving it permission to create subdomains.
  */
-contract SubdomainRegistrar is Ownable {
+contract SubdomainRegistrar is Ownable, ERC1155Holder {
     INameWrapper private immutable nameWrapper;
     IENSRegistry private immutable ensRegistry;
-
 
     bytes32 public parentNode;
     address public publicResolver;
 
-    // --- EVENTS ---
     event SubdomainRegistered(bytes32 indexed node, string label, address owner);
 
     /**
@@ -53,22 +54,19 @@ contract SubdomainRegistrar is Ownable {
         uint32 fuses = 0;
         uint64 expiry = 0;
 
-        // --- FIXED LOGIC ---
-
-        // 1. Create the subdomain and assign ownership to THIS contract first
+        // 1. Create the subdomain and assign ownership to THIS contract first.
+        // This now works because the contract is an ERC1155Holder.
         nameWrapper.setSubnodeOwner(parentNode, label, address(this), fuses, expiry);
 
         // 2. Calculate the namehash of the newly created subdomain
         bytes32 subnode = keccak256(abi.encodePacked(parentNode, keccak256(bytes(label))));
 
-        // 3. Set the public resolver (this now works because the contract is the owner)
+        // 3. Set the public resolver
         ensRegistry.setResolver(subnode, publicResolver);
 
-        // 4. NOW, transfer ownership of the subdomain from this contract to the player
+        // 4. Transfer ownership of the subdomain from this contract to the player
         nameWrapper.setSubnodeOwner(parentNode, label, playerAddress, fuses, expiry);
         
-        // --- END OF FIX ---
-
         emit SubdomainRegistered(subnode, label, playerAddress);
     }
 
