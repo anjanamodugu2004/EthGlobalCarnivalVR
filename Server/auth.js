@@ -3,9 +3,14 @@ require("dotenv").config();
 const thirdwebRoutes = require("./thirdweb");
 const http = require('http');
 const WebSocket = require('ws');
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
+
+app.use(cors());
+
+const randomNumbers = new Map();
 
 const server = http.createServer(app);
 
@@ -114,6 +119,47 @@ app.post("/ismobile", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Failed to process mobile request" });
   }
+});
+
+app.post('/random-number-result', (req, res) => {
+    const { sequenceNumber, randomNumber, timestamp } = req.body;
+    console.log(`Received random number: ${randomNumber} for sequence: ${sequenceNumber}`);
+    
+    // Store the random number
+    randomNumbers.set(sequenceNumber, {
+        randomNumber,
+        timestamp,
+        receivedAt: new Date().toISOString()
+    });
+    
+    console.log(`Stored random number ${randomNumber} for sequence ${sequenceNumber}`);
+    res.json({ success: true, message: 'Random number received' });
+});
+
+// Endpoint to get all random numbers
+app.get('/random-numbers', (req, res) => {
+    const results = Array.from(randomNumbers.entries()).map(([seq, data]) => ({
+        sequenceNumber: seq,
+        ...data
+    }));
+    res.json(results);
+});
+
+// Endpoint to get specific random number
+app.get('/random-number/:sequenceNumber', (req, res) => {
+    const { sequenceNumber } = req.params;
+    const result = randomNumbers.get(sequenceNumber);
+    
+    if (result) {
+        res.json({ sequenceNumber, ...result });
+    } else {
+        res.status(404).json({ error: 'Random number not found' });
+    }
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.use("/v1", thirdwebRoutes);
