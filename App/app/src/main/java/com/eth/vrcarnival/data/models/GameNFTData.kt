@@ -5,21 +5,31 @@ import com.eth.vrcarnival.R
 data class GameNFT(
     val id: String,
     val name: String,
-    val drawableRes: Int,
+    val description: String? = null,
+    val imageUrl: String? = null,
+    val drawableRes: Int? = null,
     val isMinted: Boolean,
-    val color: String = "#6366F1"
+    val isOwned: Boolean = false,
+    val price: NFTPrice? = null,
+    val rarity: String? = null
+)
+
+
+data class NFTPrice(
+    val amount: String,
+    val currency: String, // Token address or "ETH"
+    val displayAmount: String // Formatted amount for display
+)
+
+data class NFTPurchaseRequest(
+    val from: String,
+    val chainId: Int,
+    val recipients: List<Recipient>, // Payment to our wallet
+    val nftTokenId: String,
+    val nftContractAddress: String
 )
 
 object GameNFTData {
     fun getGameNFTs(): List<GameNFT> = listOf(
-        GameNFT("spinx", "SpinX", R.drawable.spinx, true),
-        GameNFT("charmz", "Charmz", R.drawable.charmz, false),
-        GameNFT("unixy", "Unixy", R.drawable.unixy, true),
-        GameNFT("squidy", "Squidy", R.drawable.squidy, false),
-        GameNFT("wiz", "Wiz", R.drawable.wiz, true),
-        GameNFT("wittyfox", "WittyFox", R.drawable.witty_fox, false),
-        GameNFT("kat", "Kat", R.drawable.katz, true),
-        GameNFT("pup", "Pup", R.drawable.pup, false),
-        GameNFT("joko", "Joko", R.drawable.joko, true)
     )
 }

@@ -19,17 +19,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.eth.vrcarnival.data.models.GameNFT
 import com.eth.vrcarnival.ui.theme.*
 import kotlinx.coroutines.delay
+import com.eth.vrcarnival.R
 
 @Composable
 fun NFTCollectionGrid(
     nfts: List<GameNFT>,
+    onNFTClick: (GameNFT) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -55,11 +60,11 @@ fun NFTCollectionGrid(
                     color = TextPrimary
                 )
 
-                val mintedCount = nfts.count { it.isMinted }
+                val ownedCount = nfts.count { it.isOwned }
                 Text(
-                    text = "$mintedCount/${nfts.size} Minted",
+                    text = "$ownedCount/${nfts.size} Owned",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (mintedCount == nfts.size) CyberGreen else TextAccent,
+                    color = if (ownedCount == nfts.size) CyberGreen else TextAccent,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -84,7 +89,10 @@ fun NFTCollectionGrid(
                         visible = isVisible,
                         enter = fadeIn(tween(500)) + scaleIn(tween(500))
                     ) {
-                        NFTCard(nft = nft)
+                        NFTCard(
+                            nft = nft,
+                            onClick = { onNFTClick(nft) }
+                        )
                     }
                 }
             }
@@ -95,27 +103,34 @@ fun NFTCollectionGrid(
 @Composable
 fun NFTCard(
     nft: GameNFT,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     PremiumCard(
-        rarity = if (nft.isMinted) "rare" else "common",
+        rarity = nft.rarity?.lowercase() ?: "common",
+        onClick = onClick,
         modifier = modifier.aspectRatio(1f)
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            // NFT Image with color tinting for differentiation
-            Image(
-                painter = painterResource(id = nft.drawableRes),
+            // Network image with fallback to local drawable
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(nft.imageUrl ?: "")
+                    .crossfade(true)
+                    .placeholder(nft.drawableRes ?: R.drawable.unixy)
+                    .error(nft.drawableRes ?: R.drawable.unixy)
+                    .build(),
                 contentDescription = nft.name,
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop,
-                colorFilter = if (!nft.isMinted) {
+                colorFilter = if (!nft.isOwned) {
                     ColorFilter.colorMatrix(
                         ColorMatrix().apply {
-                            setToSaturation(0.2f) // Fixed: use setToSaturation
+                            setToSaturation(0.3f)
                         }
                     )
                 } else {
@@ -123,20 +138,41 @@ fun NFTCard(
                 }
             )
 
-            // Overlay for unminted NFTs
-            if (!nft.isMinted) {
+            // Overlay for unowned NFTs
+            if (!nft.isOwned) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
-                                    Color.Black.copy(alpha = 0.6f),
-                                    Color.Black.copy(alpha = 0.8f)
+                                    Color.Black.copy(alpha = 0.4f),
+                                    Color.Black.copy(alpha = 0.7f)
                                 )
                             )
                         )
                 )
+
+                // Purchase price overlay
+                nft.price?.let { price ->
+                    Card(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = ElectricBlue.copy(alpha = 0.9f)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "${price.displayAmount} ETH",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                }
             }
 
             // NFT Name and Status
@@ -149,7 +185,7 @@ fun NFTCard(
                     text = nft.name,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = if (nft.isMinted) TextPrimary else Color.White,
+                    color = if (nft.isOwned) TextPrimary else Color.White,
                     textAlign = TextAlign.Start
                 )
 
@@ -162,28 +198,28 @@ fun NFTCard(
                             .size(8.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(
-                                if (nft.isMinted) CyberGreen else WarningOrange
+                                if (nft.isOwned) CyberGreen else WarningOrange
                             )
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (nft.isMinted) "Minted" else "Locked",
+                        text = if (nft.isOwned) "Owned" else "Buy Now",
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (nft.isMinted) CyberGreen else WarningOrange,
+                        color = if (nft.isOwned) CyberGreen else WarningOrange,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
 
-            // Rarity indicator for minted NFTs
-            if (nft.isMinted) {
+            // Ownership indicator
+            if (nft.isOwned) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
                         .size(12.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(RarityRare)
+                        .background(CyberGreen)
                 )
             }
         }

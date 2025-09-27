@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging.interceptor)
 
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.foundation)
