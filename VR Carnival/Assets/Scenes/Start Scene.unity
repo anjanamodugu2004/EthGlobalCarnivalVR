@@ -920,6 +920,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4498228932834535457, guid: fa16d5bbcd69f8e4d887ea681ebca285, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1221573971}
+    - targetCorrespondingSourceObject: {fileID: 4498228932834535457, guid: fa16d5bbcd69f8e4d887ea681ebca285, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1221573973}
   m_SourcePrefab: {fileID: 100100000, guid: fa16d5bbcd69f8e4d887ea681ebca285, type: 3}
 --- !u!1 &893821937
 GameObject:
@@ -1043,6 +1046,18 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 4, z: 0}
+--- !u!114 &1221573973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221573970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ce93c456f4649e688f67c7ceda79b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1299758868
 GameObject:
   m_ObjectHideFlags: 0
