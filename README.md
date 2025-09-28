@@ -63,6 +63,11 @@ This project was built for the prestigious ETH Global hackathon, showcasing the 
 - Nithish Sriram | `Backend Developer`
 - Dave Meshak J | `Blockchain Developer`
 
+
+## Code of Conduct
+
+Please read and follow our [Code of Conduct](./CODE_OF_CONDUCT.md) to help us maintain a welcoming and inclusive community.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
