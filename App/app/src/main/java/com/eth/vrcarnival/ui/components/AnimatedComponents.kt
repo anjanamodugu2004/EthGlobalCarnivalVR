@@ -190,7 +190,7 @@ fun PowerMeterBalance(
     LaunchedEffect(balance) {
         isVisible = true
         // Animate power level based on balance
-        powerLevel = (balance.toFloatOrNull() ?: 0f) / 100f // Normalize to 0-1
+        powerLevel = (balance.toFloatOrNull() ?: 0f) / 100f
         powerLevel = powerLevel.coerceIn(0f, 1f)
     }
 
