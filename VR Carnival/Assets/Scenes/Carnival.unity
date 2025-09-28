@@ -1859,7 +1859,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rideButton: {fileID: 270005154}
-  scoreText: {fileID: 1117414106}
+  scoreText: {fileID: 0}
   seatPosition: {fileID: 1112278905}
   exitPosition: {fileID: 1315646285}
   rideCost: 20
@@ -2152,7 +2152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameDuration: 120
-  timerText: {fileID: 1934595119}
+  timerText: {fileID: 0}
   scoreText: {fileID: 0}
   dartSpawner: {fileID: 1093897169}
   score: 0
@@ -3700,9 +3700,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1936057870}
-        m_TargetAssemblyTypeName: PythRandomGen, Assembly-CSharp
-        m_MethodName: GenerateRandomNumber
+      - m_Target: {fileID: 1392397083}
+        m_TargetAssemblyTypeName: ColorBlockManager, Assembly-CSharp
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8080,8 +8080,7 @@ MonoBehaviour:
   - {fileID: 1993173747}
   - {fileID: 549230954}
   scoreText: {fileID: 1117414106}
-  duration: 30
-  interval: 3
+  statusText: {fileID: 0}
 --- !u!4 &1392397084
 Transform:
   m_ObjectHideFlags: 0
