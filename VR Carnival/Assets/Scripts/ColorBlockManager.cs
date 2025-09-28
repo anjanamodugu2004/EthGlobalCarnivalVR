@@ -4,18 +4,18 @@ using TMPro;
 public class ColorBlockManager : MonoBehaviour
 {
     [Header("Assign in Inspector")]
-    public GameObject[] blocks;   
-    public TMP_Text scoreText;    
-    public TMP_Text statusText;   
+    public GameObject[] blocks;
+    public TMP_Text scoreText;
+    public TMP_Text statusText;
     private string randomSequence = "";
     private int currentIndex = 0;
     private int score = 0;
-    private float duration = 30f; 
-    private float interval = 3f;  
+    private float duration = 30f;
+    private float interval = 3f;
     private bool gameRunning = false;
     public void StartGame()
     {
-        if (gameRunning) return; 
+        if (gameRunning) return;
         score = 0;
         currentIndex = 0;
         randomSequence = "";
@@ -84,4 +84,9 @@ public class ColorBlockManager : MonoBehaviour
         randomSequence = seq;
         currentIndex = 0;
     }
+    public int GetScore()
+    {
+        return score;
+    }
+
 }
