@@ -1,9 +1,21 @@
 
+
 # VR Carnival: The Web3 Metaverse of Mini Games
 
 [![VR Carnival Cover](./public/cover.jpg)](./public/cover.jpg)
 
 Welcome to **VR Carnival**, an immersive metaverse experience where players enjoy classic carnival games and fun activities—like Ferris Wheel rides, horse ring-arounds, and more—inside a vibrant virtual world. Powered by cutting-edge Web3 technology, VR Carnival redefines gaming with seamless onboarding, gasless transactions, and true digital ownership.
+<!-- Badges / Labels -->
+![Unity](https://img.shields.io/badge/Unity-2022.3-blue?logo=unity)
+![Meta XR](https://img.shields.io/badge/Meta%20XR-VR-green?logo=meta)
+![Oculus](https://img.shields.io/badge/Oculus-VR%20Ready-blueviolet?logo=oculus)
+![Ethereum](https://img.shields.io/badge/Ethereum-Solidity-3c3c3d?logo=ethereum)
+![Filecoin](https://img.shields.io/badge/Filecoin-Storage-0090ff?logo=filecoin)
+![Fluence](https://img.shields.io/badge/Fluence-DePIN-00bfae?logo=data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDBiZmFlIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0wIDE4Yy00LjQxIDAtOC0zLjU5LTgtOHMzLjU5LTggOC04IDggMy41OSA4IDgtMy41OSA4LTggOHoiLz48L3N2Zz4=)
+![Pyth Network](https://img.shields.io/badge/Pyth%20Network-Randomness-ff2e63?logo=pythnetwork)
+![ERC-721](https://img.shields.io/badge/ERC--721-NFT-yellow?logo=ethereum)
+![ERC-1155](https://img.shields.io/badge/ERC--1155-Game%20Assets-orange?logo=ethereum)
+![Embedded Wallets](https://img.shields.io/badge/Embedded%20Wallets-Gasless%20Gaming-6c63ff)
 
 ## Key Features
 
@@ -39,23 +51,21 @@ Welcome to **VR Carnival**, an immersive metaverse experience where players enjo
 4. **Store**: All digital assets are stored on Filecoin for security and transparency.
 5. **Fairness**: Game outcomes are powered by on-chain randomness from Pyth Network.
 
-## ETH Global Hackathon
+## ETH Global Hackathon 🏆
 
 This project was built for the prestigious ETH Global hackathon, showcasing the future of gaming, ownership, and decentralized infrastructure.
 
----
 
 ## Team
----
+
+- Anjana Modugu | `Unity/VR Developer`
+- Daksh Kalkarni | `Unity / VR Developer`
+- Nithish Sriram | `Backend Developer`
+- Dave Meshak J | `Blockchain Developer`
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
-**Project Leads:**
-- Anjana Modugu | `Unity/VR Developer`
-- Daksh Kalkarni | `Unity / VR Developer`
-- Nithish Sriram | `Backend Developer`
-- Dave Meshak J | `Blockchain Developer`
 
 
