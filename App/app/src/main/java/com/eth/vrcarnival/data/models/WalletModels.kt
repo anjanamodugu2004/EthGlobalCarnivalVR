@@ -136,7 +136,8 @@ data class TransferCarTokenResponse(
 
 data class UnityIntegrationRequest(
     val email: String,
-    val walletAddress: String
+    val walletAddress: String,
+    val token: String
 )
 
 data class ListTokensResponse(

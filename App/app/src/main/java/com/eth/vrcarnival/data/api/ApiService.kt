@@ -74,6 +74,4 @@ interface ApiService {
         @Path("contractAddress") contractAddress: String,
         @Path("tokenId") tokenId: String
     ): Response<NFTMetadataResponse>
-
-    // REMOVE only: getNFTs (replaced with real NFT endpoints above)
 }

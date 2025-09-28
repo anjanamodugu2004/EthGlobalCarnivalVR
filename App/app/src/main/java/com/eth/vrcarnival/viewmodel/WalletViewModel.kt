@@ -132,7 +132,7 @@ class WalletViewModel @Inject constructor(
 
     companion object {
         private const val NFT_CONTRACT_ADDRESS = "0xB68de9667F7361561f53114a4A6907Ed9360acE3"
-        private const val MAX_TOKEN_ID = 2
+        private const val MAX_TOKEN_ID = 5
     }
 
     // Replace the existing declarations with:
@@ -366,7 +366,7 @@ class WalletViewModel @Inject constructor(
                                 authManager.saveAuth(auth.token, auth.walletAddress, email)
                                 // ADD: Send wallet to Unity
                                 try {
-                                    repository.sendWalletToUnity(email, auth.walletAddress)
+                                    repository.sendWalletToUnity(email, auth.walletAddress, auth.token)
                                 } catch (e: Exception) {
                                     // Handle silently
                                 }

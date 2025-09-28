@@ -35,8 +35,8 @@ class WalletRepository @Inject constructor(
     suspend fun transferCarTokens(token: String, request: TransferCarTokenRequest) =
         apiService.transferCarTokens("Bearer $token", request)
 
-    suspend fun sendWalletToUnity(email: String, walletAddress: String) =
-        apiService.sendWalletToUnity(UnityIntegrationRequest(email, walletAddress))
+    suspend fun sendWalletToUnity(email: String, walletAddress: String, token: String) =
+        apiService.sendWalletToUnity(UnityIntegrationRequest(email, walletAddress, token))
 
     suspend fun getUniversalNFTs(contractAddress: String, walletAddress: String) =
         apiService.getUniversalNFTs(contractAddress, walletAddress)
