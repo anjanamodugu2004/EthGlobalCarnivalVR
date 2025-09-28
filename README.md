@@ -5,7 +5,7 @@
 
 Welcome to **VR Carnival**, an immersive metaverse experience where players enjoy classic carnival games and fun activities—like Ferris Wheel rides, horse ring-arounds, and more—inside a vibrant virtual world. Powered by cutting-edge Web3 technology, VR Carnival redefines gaming with seamless onboarding, gasless transactions, and true digital ownership.
 
-## 🚀 Key Features
+## Key Features
 
 - **Metaverse Carnival**: Explore a virtual fairground packed with mini games and interactive attractions.
 - **Gasless Gaming**: Players receive embedded wallets upon onboarding. All transaction fees are sponsored, ensuring a frictionless, uninterrupted experience.
@@ -16,13 +16,13 @@ Welcome to **VR Carnival**, an immersive metaverse experience where players enjo
 - **DePIN Infrastructure**: Game APIs are hosted on Fluence, leveraging decentralized compute for reliability and censorship resistance.
 - **VR Technology**: Built with Unity, Meta XR, and Oculus for a fully immersive, cross-platform experience.
 
-## 🕹️ Gameplay Highlights
+## Gameplay Highlights
 
 - **Mini Games**: Enjoy a variety of classic and innovative carnival games.
 - **NFT Rewards**: Win or purchase NFTs representing game assets, collectibles, and achievements.
 - **Color Guess Game**: Experience true randomness and fairness with Pyth Network’s entropy-powered RNG.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Unity, Meta XR, Oculus**: VR game development and deployment.
 - **Ethereum & Solidity**: Smart contracts for game logic, asset management, and rewards.
@@ -31,7 +31,7 @@ Welcome to **VR Carnival**, an immersive metaverse experience where players enjo
 - **Pyth Network**: On-chain randomness for game mechanics.
 - **Embedded Wallets**: Seamless onboarding and gasless transactions for all players.
 
-## 🌐 How It Works
+## How It Works
 
 1. **Onboard**: Players join the carnival and receive an embedded wallet.
 2. **Play**: Enjoy games and activities without worrying about gas fees—transactions are sponsored by the platform.
@@ -39,13 +39,18 @@ Welcome to **VR Carnival**, an immersive metaverse experience where players enjo
 4. **Store**: All digital assets are stored on Filecoin for security and transparency.
 5. **Fairness**: Game outcomes are powered by on-chain randomness from Pyth Network.
 
-## 🏆 ETH Global Hackathon
+## ETH Global Hackathon
 
 This project was built for the prestigious ETH Global hackathon, showcasing the future of gaming, ownership, and decentralized infrastructure.
 
 ---
 
-## 👥 Team
+## Team
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 **Project Leads:**
 - Anjana Modugu | `Unity/VR Developer`
