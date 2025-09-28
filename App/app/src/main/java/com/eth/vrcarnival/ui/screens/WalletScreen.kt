@@ -39,6 +39,7 @@ import com.eth.vrcarnival.ui.theme.TextSecondary
 import com.eth.vrcarnival.viewmodel.WalletViewModel
 import kotlinx.coroutines.delay
 import com.eth.vrcarnival.R
+import com.eth.vrcarnival.data.models.GameNFT
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,6 +166,17 @@ fun WalletScreen(
             viewModel = viewModel,
             onDismiss = { viewModel.closeSendDialog() }
         )
+    }
+
+    if (viewModel.showNFTPurchaseDialog) {
+        viewModel.selectedNFTForPurchase?.let { nft ->
+            NFTPurchaseDialog(
+                nft = nft,
+                onPurchase = { viewModel.purchaseNFT(nft) },
+                onDismiss = { viewModel.closeNFTPurchaseDialog() },
+                isPurchasing = viewModel.isPurchasingNFT
+            )
+        }
     }
 
     // Toast Messages
@@ -673,6 +685,64 @@ fun CarTokenItem(
                             color = TextAccent
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NFTPurchaseDialog(
+    nft: GameNFT,
+    onPurchase: () -> Unit,
+    onDismiss: () -> Unit,
+    isPurchasing: Boolean
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Text(
+                    text = "Purchase ${nft.name}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                nft.price?.let { price ->
+                    Text(
+                        text = "Price: ${price.displayAmount} ${price.currency}",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        enabled = !isPurchasing
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    LoadingButton(
+                        text = "Purchase",
+                        isLoading = isPurchasing,
+                        onClick = onPurchase,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }

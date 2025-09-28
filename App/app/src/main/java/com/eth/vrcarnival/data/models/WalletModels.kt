@@ -178,3 +178,38 @@ data class NFTAttribute(
     val trait_type: String,
     val value: String
 )
+
+data class FilecoinSaveRequest(
+    val userEmail: String,
+    val data: FilecoinData
+)
+
+data class FilecoinData(
+    val nftPurchase: NFTPurchaseData? = null,
+    val gameData: Map<String, Any>? = null
+)
+
+data class NFTPurchaseData(
+    val nftId: String,
+    val contractAddress: String,
+    val transactionId: String,
+    val purchasePrice: String,
+    val timestamp: Long
+)
+
+data class FilecoinSaveResponse(
+    val success: Boolean,
+    val message: String,
+    val cid: String
+)
+
+data class FilecoinUserDataResponse(
+    val message: String,
+    val files: List<FilecoinFile>
+)
+
+data class FilecoinFile(
+    val cid: String,
+    val createdAt: String,
+    val gatewayUrl: String
+)

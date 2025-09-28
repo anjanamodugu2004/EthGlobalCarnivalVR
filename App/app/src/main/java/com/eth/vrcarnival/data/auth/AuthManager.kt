@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,6 +37,12 @@ class AuthManager @Inject constructor(
         }
     }
 
+    suspend fun getCurrentUserEmail(): String? {
+        return context.dataStore.data.map { preferences ->
+            preferences[emailKey]
+        }.first()
+    }
+
     suspend fun clearAuth() {
         context.dataStore.edit { preferences ->
             preferences.clear()
@@ -51,3 +58,4 @@ data class AuthState(
     val isAuthenticated: Boolean
         get() = !token.isNullOrBlank() && !walletAddress.isNullOrBlank()
 }
+

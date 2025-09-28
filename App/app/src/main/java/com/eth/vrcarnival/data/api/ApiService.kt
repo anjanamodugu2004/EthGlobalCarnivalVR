@@ -32,6 +32,13 @@ interface ApiService {
         @Body request: SendTokenRequest
     ): Response<ApiResponse<SendTransactionResponse>>
 
+    // ADD: Filecoin endpoints
+    @POST("api/save")
+    suspend fun saveToFilecoin(@Body request: FilecoinSaveRequest): Response<FilecoinSaveResponse>
+
+    @GET("api/user/{email}")
+    suspend fun getUserFilecoinData(@Path("email") email: String): Response<FilecoinUserDataResponse>
+
     @POST("v1/verify-balance-change")
     suspend fun verifyBalanceChange(
         @Body request: VerifyBalanceChangeRequest

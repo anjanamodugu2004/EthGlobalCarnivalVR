@@ -161,9 +161,7 @@ class WalletViewModel @Inject constructor(
                                         auth.walletAddress
                                     )
 
-                                    val isOwned = ownershipResponse.isSuccessful &&
-                                            ownershipResponse.body()?.data?.tokenId == tokenId.toString() &&
-                                            (ownershipResponse.body()?.data?.balance?.toIntOrNull() ?: 0) > 0
+                                    val isOwned = checkNFTOwnership(tokenId.toString(), auth.walletAddress)
 
                                     metadata?.let { meta ->
                                         // Parse price from metadata
@@ -214,6 +212,48 @@ class WalletViewModel @Inject constructor(
         }
     }
 
+    private suspend fun checkNFTOwnership(tokenId: String, walletAddress: String): Boolean {
+        try {
+            // First check blockchain ownership
+            val ownershipResponse = repository.getUniversalNFTs(nftContractAddress, walletAddress)
+            val isOwnedOnChain = ownershipResponse.isSuccessful &&
+                    ownershipResponse.body()?.data?.tokenId == tokenId &&
+                    (ownershipResponse.body()?.data?.balance?.toIntOrNull() ?: 0) > 0
+
+            // Also check Filecoin records if not owned on-chain
+            if (!isOwnedOnChain) {
+                return checkFilecoinOwnership(tokenId)
+            }
+
+            return isOwnedOnChain
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
+    private suspend fun checkFilecoinOwnership(tokenId: String): Boolean {
+        try {
+            val userEmail = authManager.getCurrentUserEmail()
+            if (userEmail != null) {
+                val response = repository.getUserFilecoinData(userEmail)
+                if (response.isSuccessful) {
+                    response.body()?.files?.forEach { file ->
+                        try {
+                            // You would need to fetch the gateway URL content and parse for NFT purchases
+                            // For now, return false but you can implement gateway URL parsing
+                            // to check if this tokenId was purchased
+                        } catch (e: Exception) {
+                            // Continue checking other files
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Handle silently
+        }
+        return false
+    }
+
     fun openNFTPurchaseDialog(nft: GameNFT) {
         selectedNFTForPurchase = nft
         showNFTPurchaseDialog = true
@@ -262,6 +302,8 @@ class WalletViewModel @Inject constructor(
                             val result = response.body()?.result
                             val transactionId = result?.transactionIds?.firstOrNull()
                             if (transactionId != null) {
+                                // Save purchase to Filecoin
+                                saveNFTPurchaseToFilecoin(nft, transactionId, price.amount)
                                 // Close dialog immediately after successful payment
                                 closeNFTPurchaseDialog()
                                 // Refresh NFT data to check ownership
@@ -283,6 +325,30 @@ class WalletViewModel @Inject constructor(
             } ?: run {
                 error = "NFT price not available"
             }
+        }
+    }
+
+    private suspend fun saveNFTPurchaseToFilecoin(nft: GameNFT, transactionId: String, price: String) {
+        try {
+            val userEmail = authManager.getCurrentUserEmail()
+            if (userEmail != null) {
+                val filecoinRequest = FilecoinSaveRequest(
+                    userEmail = userEmail,
+                    data = FilecoinData(
+                        nftPurchase = NFTPurchaseData(
+                            nftId = nft.id,
+                            contractAddress = nftContractAddress,
+                            transactionId = transactionId,
+                            purchasePrice = price,
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
+                )
+
+                repository.saveToFilecoin(filecoinRequest)
+            }
+        } catch (e: Exception) {
+            // Handle silently - don't fail the purchase if Filecoin save fails
         }
     }
 

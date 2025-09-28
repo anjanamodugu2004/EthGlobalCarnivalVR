@@ -4,6 +4,7 @@ import com.eth.vrcarnival.data.api.ApiService
 import com.eth.vrcarnival.data.models.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import retrofit2.Response
 
 @Singleton
 class WalletRepository @Inject constructor(
@@ -43,4 +44,12 @@ class WalletRepository @Inject constructor(
 
     suspend fun getNFTMetadata(contractAddress: String, tokenId: String) =
         apiService.getNFTMetadata(contractAddress, tokenId)
+
+    suspend fun saveToFilecoin(request: FilecoinSaveRequest): Response<FilecoinSaveResponse> {
+        return apiService.saveToFilecoin(request)
+    }
+
+    suspend fun getUserFilecoinData(email: String): Response<FilecoinUserDataResponse> {
+        return apiService.getUserFilecoinData(email)
+    }
 }

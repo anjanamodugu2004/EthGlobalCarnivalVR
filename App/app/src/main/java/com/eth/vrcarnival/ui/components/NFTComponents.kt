@@ -115,12 +115,11 @@ fun NFTCard(
             modifier = Modifier.fillMaxSize()
         ) {
             // Network image with fallback to local drawable
+            // Replace the existing AsyncImage in NFTCard with:
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(nft.imageUrl ?: "")
                     .crossfade(true)
-                    .placeholder(nft.drawableRes ?: R.drawable.unixy)
-                    .error(nft.drawableRes ?: R.drawable.unixy)
                     .build(),
                 contentDescription = nft.name,
                 modifier = Modifier
@@ -135,7 +134,9 @@ fun NFTCard(
                     )
                 } else {
                     null
-                }
+                },
+                // Only use local drawable as absolute fallback
+                error = painterResource(nft.drawableRes ?: R.drawable.unixy)
             )
 
             // Overlay for unowned NFTs
